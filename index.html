@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Method information study</title>
+<style>
+/* One fixed light theme for every participant: the stimulus must look the same on every device. */
+:root {
+  color-scheme: light;
+  --bg: #f6f5f2; --paper: #ffffff; --ink: #1d1d1b; --ink-2: #4a4945; --ink-3: #6d6b66;
+  --rule: #e2dfd8; --rule-2: #cfcbc2; --accent: #1f5f8b; --accent-soft: #e8f0f6; --warn: #8a1c1c; --warn-soft: #fbeaea;
+  --ok: #1e6b3a; --radius: 10px; --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--sans); }
+a { color: var(--accent); }
+button { font: inherit; }
+.banner { background: var(--warn-soft); color: var(--warn); border-bottom: 1px solid #e8c4c4; padding: 10px 16px; font-size: 14px; }
+.banner b { font-weight: 650; }
+.pv { background: #fff7d6; border-bottom: 1px solid #e9d88a; padding: 8px 16px; font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.pv select { font: 13px var(--sans); padding: 3px 6px; border: 1px solid var(--rule-2); border-radius: 6px; background: #fff; }
+.pv b { font-weight: 650; }
+header.bar { position: sticky; top: 0; z-index: 5; background: rgba(246,245,242,.96); backdrop-filter: blur(4px); border-bottom: 1px solid var(--rule); }
+.bar-in { max-width: 1240px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.kicker { font-size: 13px; color: var(--ink-3); letter-spacing: .02em; }
+.kicker b { color: var(--ink-2); font-weight: 600; }
+.prog { height: 3px; background: var(--rule); }
+.prog i { display: block; height: 3px; background: var(--accent); transition: width .3s; }
+.tabs { display: none; max-width: 1240px; margin: 0 auto; padding: 0 16px 10px; gap: 6px; }
+.tabs button { flex: 1; font: 600 14px/1 var(--sans); padding: 10px 6px; border-radius: 8px; border: 1px solid var(--rule-2); background: var(--paper); color: var(--ink-2); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+main.split { max-width: 1240px; margin: 0 auto; padding: 20px 16px 24px; display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 28px; align-items: start; }
+main.single { max-width: 780px; margin: 0 auto; padding: 24px 16px 24px; }
+.pane { min-width: 0; }
+.method { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius); padding: 28px 32px 32px; }
+.method h1 { font-size: 30px; line-height: 1.2; margin: 0 0 4px; letter-spacing: -.01em; }
+.method .sub { color: var(--ink-3); font-size: 14px; margin: 0 0 18px; }
+.method section { border-top: 1px solid var(--rule); padding: 16px 0 4px; }
+.method section:first-of-type { border-top: 0; padding-top: 4px; }
+.method h2 { font-size: 17px; line-height: 1.3; margin: 0 0 6px; color: var(--ink); letter-spacing: .005em; }
+.method h3 { font-size: 15px; margin: 12px 0 4px; color: var(--ink-2); }
+.method p { margin: 0 0 10px; }
+.method ul, .method ol { margin: 0 0 10px; padding-left: 22px; }
+.method li { margin: 0 0 6px; }
+.method img { max-width: 100%; height: auto; border-radius: 6px; }
+.method table, .task table { border-collapse: collapse; margin: 6px 0 12px; font-size: 15px; }
+.method td, .method th, .task td, .task th { border: 1px solid var(--rule-2); padding: 4px 8px; text-align: left; vertical-align: top; }
+.nopage { background: #f3f2ee; border-radius: 8px; padding: 14px 16px; color: var(--ink-2); }
+.panel { position: sticky; top: 70px; max-height: calc(100vh - 86px); overflow: auto; display: grid; gap: 16px; padding-bottom: 8px; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius); padding: 18px 20px; }
+.card h1 { font-size: 24px; line-height: 1.25; margin: 0 0 10px; }
+.card h2 { font-size: 16px; margin: 0 0 2px; }
+.card h3 { font-size: 16px; margin: 18px 0 4px; }
+.card .lead { font-size: 14px; color: var(--ink-3); margin: 0 0 12px; }
+.body p { margin: 0 0 12px; }
+.body ul, .body ol { padding-left: 22px; margin: 0 0 12px; }
+.body li { margin: 0 0 6px; }
+.task p, .task li { font-size: 15px; }
+.task .instr { background: #f3f2ee; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: var(--ink-2); margin: 0 0 12px; }
+.task ol, .task ul { padding-left: 22px; margin: 0 0 10px; }
+.task ol[type="A"] { list-style-type: upper-alpha; }
+.screens { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 6px 0 4px; }
+.phone { border: 2px solid #3a3a37; border-radius: 16px; padding: 9px 9px 11px; background: #fff; font-size: 12px; line-height: 1.35; min-height: 240px; display: flex; flex-direction: column; gap: 6px; max-width: 260px; }
+.phone .cap { font: 600 11px/1.2 var(--sans); color: var(--ink-3); text-align: center; margin-bottom: 2px; }
+.ph-top { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 12px; border-bottom: 1px solid var(--rule); padding-bottom: 4px; }
+.ph-tabs { display: flex; gap: 4px; }
+.ph-tabs span { flex: 1; text-align: center; border: 1px solid var(--rule-2); border-radius: 5px; padding: 2px 0; font-size: 10.5px; }
+.ph-tabs span.on { background: #3a3a37; color: #fff; border-color: #3a3a37; }
+.ph-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--rule); border-radius: 5px; padding: 3px 5px; }
+.ph-plus { border: 1px solid #3a3a37; border-radius: 4px; width: 16px; height: 16px; display: inline-grid; place-items: center; font-weight: 700; line-height: 1; }
+.ph-btn { margin-top: auto; text-align: center; background: #3a3a37; color: #fff; border-radius: 6px; padding: 5px 0; font-weight: 600; }
+.ph-note { color: var(--ink-3); font-style: italic; font-size: 10.5px; }
+.ph-toast { align-self: center; background: #3a3a37; color: #fff; border-radius: 10px; padding: 2px 10px; font-size: 10.5px; }
+/* questions and forms */
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.item { border: 0; box-shadow: inset 0 1px 0 var(--rule); padding: 14px 0 8px; }
+.item:first-child { box-shadow: none; padding-top: 2px; }
+.item .t, .item legend { display: block; font-weight: 600; font-size: 15px; line-height: 1.45; margin: 0 0 8px; padding: 0; }
+.item legend { float: left; width: 100%; }
+.item legend ~ * { clear: both; }
+.item .note { font-size: 13.5px; color: var(--ink-3); margin: -4px 0 8px; }
+.item.bad .t, .item.bad legend { color: var(--warn); }
+.item .err { display: none; color: var(--warn); font-size: 13.5px; margin-top: 4px; }
+.item.bad .err { display: block; }
+.opt { display: grid; grid-template-columns: 26px 1fr; gap: 6px; align-items: start; font-size: 15px; line-height: 1.45; padding: 5px 6px; border-radius: 6px; cursor: pointer; }
+.opt:hover { background: #f3f2ee; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt .let { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--rule-2); font: 600 12px/1 var(--sans); color: var(--ink-2); margin-top: 1px; }
+.opt .box { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 5px; border: 1.5px solid var(--rule-2); margin-top: 1px; }
+.opt input:checked + .let, .opt input:checked + .box { background: var(--accent); border-color: var(--accent); color: #fff; }
+.opt input:checked + .box::after { content: "✓"; font-size: 13px; font-weight: 700; }
+.opt input:focus-visible + .let, .opt input:focus-visible + .box { outline: 2px solid var(--accent); outline-offset: 2px; }
+.other { margin: 4px 0 0 32px; }
+input.txt, textarea { width: 100%; font: 15px/1.5 var(--sans); padding: 8px 10px; border: 1px solid var(--rule-2); border-radius: 8px; background: #fff; color: var(--ink); }
+input.num { width: 120px; font: 15px var(--sans); padding: 7px 9px; border: 1px solid var(--rule-2); border-radius: 8px; }
+textarea { min-height: 150px; resize: vertical; }
+textarea.short { min-height: 96px; }
+input.txt:focus, textarea:focus, input.num:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+.scale { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 2px; }
+.scale label { position: relative; }
+.scale input { position: absolute; opacity: 0; pointer-events: none; }
+.scale .n { display: inline-grid; place-items: center; min-width: 38px; height: 38px; padding: 0 6px; border: 1.5px solid var(--rule-2); border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; background: #fff; color: var(--ink-2); }
+.scale input:checked + .n { background: var(--accent); color: #fff; border-color: var(--accent); }
+.scale input:focus-visible + .n { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ends { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+.grid .grow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 14px; align-items: center; padding: 8px 0; border-top: 1px dashed var(--rule); }
+.grid .grow:first-of-type { border-top: 0; }
+.grid .gl { font-size: 14.5px; line-height: 1.4; }
+.grid .gl b { font-weight: 600; }
+.grid .scale { margin: 0; flex-wrap: nowrap; }
+.grid .grow.bad .gl { color: var(--warn); }
+.legend { font-size: 13px; color: var(--ink-3); background: #f3f2ee; border-radius: 8px; padding: 8px 10px; margin: 0 0 6px; }
+.checks { display: grid; gap: 4px; margin: 14px 0 6px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.btn { font: 600 15px/1 var(--sans); padding: 12px 18px; border-radius: 9px; border: 1px solid #3a3a37; background: #fff; color: var(--ink); cursor: pointer; text-decoration: none; display: inline-block; }
+.btn.primary { background: #1d1d1b; color: #fff; border-color: #1d1d1b; }
+.btn.quiet { border-color: var(--rule-2); color: var(--ink-2); }
+.btn:disabled { opacity: .45; cursor: default; }
+.formerr { color: var(--warn); font-size: 14px; margin-top: 10px; }
+.foot { max-width: 1240px; margin: 0 auto; padding: 8px 16px 40px; display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--ink-3); }
+.foot button { background: none; border: 0; color: var(--ink-3); text-decoration: underline; cursor: pointer; padding: 0; font-size: 13px; }
+.saved.bad { color: var(--warn); }
+.modal { position: fixed; inset: 0; background: rgba(29,29,27,.45); display: grid; place-items: center; z-index: 50; padding: 16px; }
+.modal .card { max-width: 480px; width: 100%; }
+.msg { max-width: 760px; margin: 48px auto; background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius); padding: 24px 28px; }
+.msg h1 { font-size: 22px; margin: 0 0 8px; }
+@media (max-width: 1079px) {
+  main.split { grid-template-columns: minmax(0, 1fr); padding-top: 12px; }
+  .tabs { display: flex; }
+  .panel { position: static; max-height: none; overflow: visible; }
+  .method { padding: 20px 18px 24px; }
+  .method h1 { font-size: 25px; }
+  body[data-tab="method"] .panel, body[data-tab="work"] .pane-method { display: none; }
+}
+@media (max-width: 600px) {
+  .card { padding: 16px; }
+  .grid .grow { grid-template-columns: minmax(0, 1fr); }
+  .scale .n { min-width: 36px; height: 36px; }
+  .msg { margin: 24px 16px; padding: 20px; }
+}
+</style>
+</head>
+<body data-tab="method">
+<div id="root"></div>
+<script>
+(function () {
+  'use strict';
+  const Q = new URLSearchParams(location.search);
+  const root = document.getElementById('root');
+  const PREVIEW = Q.get('preview') === '1';
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function h(tag, attrs, ...kids) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k in attrs) {
+      const v = attrs[k];
+      if (v == null || v === false) continue;
+      if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+      else if (k === 'html') e.innerHTML = v;
+      else e.setAttribute(k, v === true ? '' : v);
+    }
+    kids.flat().forEach(k => { if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(String(k))); });
+    return e;
+  }
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const ls = {
+    get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } },
+    del(k) { try { localStorage.removeItem(k); } catch (e) { } },
+  };
+  function token() {
+    const a = new Uint8Array(12); (window.crypto || window.msCrypto).getRandomValues(a);
+    return 't' + Array.from(a, x => (x % 36).toString(36)).join('');
+  }
+
+  /* ---------- text helpers ---------- */
+  function inline(s) {
+    return esc(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<i>$2</i>')
+      .replace(/\[([^\]]+)\]\(((?:https?:\/\/|mailto:)[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  }
+  function md(src) {
+    let out = '', list = null, para = [];
+    const flush = () => { if (para.length) { out += '<p>' + inline(para.join(' ')) + '</p>'; para = []; } };
+    const close = () => { if (list) { out += '</' + list + '>'; list = null; } };
+    String(src || '').replace(/\r/g, '').split('\n').forEach(raw => {
+      const l = raw.trim(); let m;
+      if (!l) { flush(); close(); return; }
+      if ((m = /^#{1,4}\s+(.*)$/.exec(l))) { flush(); close(); out += '<h3>' + inline(m[1]) + '</h3>'; return; }
+      if ((m = /^\d+[.)]\s+(.*)$/.exec(l))) { flush(); if (list !== 'ol') { close(); out += '<ol>'; list = 'ol'; } out += '<li>' + inline(m[1]) + '</li>'; return; }
+      if ((m = /^[-*]\s+(.*)$/.exec(l))) { flush(); if (list !== 'ul') { close(); out += '<ul>'; list = 'ul'; } out += '<li>' + inline(m[1]) + '</li>'; return; }
+      close(); para.push(l);
+    });
+    flush(); close();
+    return out;
+  }
+  /* Researcher-authored HTML is still passed through an allow-list before it is shown. */
+  const KEEP = { P: 1, UL: 1, OL: 1, LI: 1, B: 1, STRONG: 1, I: 1, EM: 1, BR: 1, A: 1, H3: 1, H4: 1, TABLE: 1, THEAD: 1, TBODY: 1, TR: 1, TH: 1, TD: 1, IMG: 1, SUP: 1, SUB: 1, U: 1 };
+  const RICH = { DIV: 1, SPAN: 1, svg: 1, circle: 1, line: 1, path: 1, rect: 1, g: 1 };
+  const ATTR = { href: 1, src: 1, alt: 1, type: 1, start: 1, colspan: 1, rowspan: 1, class: 1, width: 1, height: 1, viewBox: 1, cx: 1, cy: 1, r: 1, x: 1, y: 1, x1: 1, y1: 1, x2: 1, y2: 1, d: 1, fill: 1, stroke: 1, 'stroke-width': 1, 'aria-label': 1, role: 1, rx: 1 };
+  function clean(html, rich) {
+    const doc = new DOMParser().parseFromString('<div>' + (html || '') + '</div>', 'text/html');
+    (function walk(node) {
+      Array.from(node.childNodes).forEach(ch => {
+        if (ch.nodeType === 3) return;
+        if (ch.nodeType !== 1) { ch.remove(); return; }
+        const tag = ch.tagName, up = tag.toUpperCase();
+        const ok = KEEP[up] || (rich && (RICH[up] || RICH[tag]));
+        if (/^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|FORM|INPUT|BUTTON|LINK|META|NOSCRIPT)$/.test(up)) { ch.remove(); return; }
+        if (!ok) { walk(ch); while (ch.firstChild) ch.parentNode.insertBefore(ch.firstChild, ch); ch.remove(); return; }
+        Array.from(ch.attributes).forEach(a => {
+          const n = a.name;
+          if (!ATTR[n] || (n === 'class' && !rich)) { ch.removeAttribute(n); return; }
+          if ((n === 'href' || n === 'src') && !/^(https?:|mailto:)/i.test(a.value.trim())) ch.removeAttribute(n);
+        });
+        if (up === 'A') { ch.setAttribute('target', '_blank'); ch.setAttribute('rel', 'noopener'); }
+        walk(ch);
+      });
+    })(doc.body.firstChild);
+    return doc.body.firstChild.innerHTML;
+  }
+
+  /* ---------- backend ---------- */
+  const b64u = {
+    dec(str) { str = str.replace(/-/g, '+').replace(/_/g, '/'); while (str.length % 4) str += '='; return new TextDecoder().decode(Uint8Array.from(atob(str), c => c.charCodeAt(0))); },
+  };
+  const OK_BACKEND = /^(https:\/\/script\.google(usercontent)?\.com\/|http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/)/;
+  function backendFromParam(b) {
+    if (!b) return null;
+    if (b[0] === '~') { try { const u = b64u.dec(b.slice(1)); return OK_BACKEND.test(u) ? u : null; } catch (e) { return null; } }
+    return /^[\w-]+$/.test(b) ? `https://script.google.com/macros/s/${b}/exec` : null;
+  }
+  const BACKEND = backendFromParam(Q.get('b'));
+  async function api(action, payload = {}, retries = 2) {
+    let last;
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const res = await fetch(BACKEND, { method: 'POST', body: JSON.stringify(Object.assign({ action }, payload)), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' });
+        const text = await res.text(); let data;
+        try { data = JSON.parse(text); } catch (e) { throw Object.assign(new Error('The study server did not answer properly (error ' + res.status + ').'), { fatal: res.ok }); }
+        if (!data.ok) throw Object.assign(new Error(data.error || 'The request failed.'), { fatal: !data.busy, busy: !!data.busy });
+        return data;
+      } catch (e) { last = e; if (e.fatal) break; if (i < retries) await sleep((e.busy ? 1600 : 800) * (i + 1)); }
+    }
+    if (last && /Failed to fetch|NetworkError|Load failed|network/i.test(last.message)) last.message = 'Could not reach the study server. Check your internet connection and try again.';
+    throw last;
+  }
+
+  /* ---------- state ---------- */
+  const S = { content: null, version: 0, group: (Q.get('g') || '').toLowerCase(), pilot: Q.get('pilot') === 'nopage' ? 'nopage' : Q.get('pilot') === '1' ? '1' : '',
+    pid: '', token: '', cond: '', step: 'consent', data: null, saving: false, again: false, saveState: 'ok', hiddenAt: 0 };
+  const C = () => S.content;
+  const T = () => S.content.texts;
+  const G = () => S.content.groups.find(g => g.id === S.group);
+  const KEY = () => 'is-study:' + (Q.get('b') || 'preview') + ':' + S.group + ':' + S.pilot;
+  const fill = s => String(s || '').replace(/\{(\w+)\}/g, (m, k) => {
+    const g = G() || {}, r = C().researcher || {};
+    return { duration: g.duration, name: r.name, affiliation: r.affiliation, email: r.email, purpose: g.purpose, teachline: g.teach ? T().teachline || '' : '' }[k] ?? m;
+  });
+  const teach = () => !!(G() && G().teach);
+  function blocksFor(cond) {
+    const pr = C().pairs.find(p => p.id === cond.slice(0, -1));
+    if (!pr) return [];
+    const first = cond.slice(-1) === '1';
+    return [{ method: pr.methods[0], format: first ? 'is' : 'core' }, { method: pr.methods[1], format: first ? 'core' : 'is' }]
+      .map(b => S.pilot === 'nopage' ? Object.assign(b, { format: 'none' }) : b);
+  }
+  function steps() {
+    const parts = k => ['b' + k + 'a', 'b' + k + 'b'].concat(teach() ? ['b' + k + 'c'] : []);
+    return ['consent', 'info', 'about'].concat(parts(1), ['between'], parts(2), ['views', 'end']);
+  }
+  function newData() {
+    return { v: 1, group: S.group, pilot: S.pilot, consent: null, about: {}, blocks: [], views: {}, t: {}, env: { w: innerWidth, h: innerHeight, touch: 'ontouchstart' in window } };
+  }
+  function persist() {
+    if (PREVIEW || S.stopped) return;
+    if (S.data) S.data.seq = (S.data.seq || 0) + 1;
+    ls.set(KEY(), { pid: S.pid, token: S.token, cond: S.cond, version: S.version, step: S.step, data: S.data });
+  }
+
+  /* ---------- saving to the Sheet ---------- */
+  let typingTimer = 0;
+  function noteTyping() { persist(); clearTimeout(typingTimer); typingTimer = setTimeout(() => sync(), 10000); }
+  async function sync() {
+    if (PREVIEW || !S.pid || S.stopped) return;
+    if (S.saving) { S.again = true; return; }
+    S.saving = true; showSaved('saving');
+    try {
+      const r = await api('save', { pid: S.pid, token: S.token, step: S.step, seq: S.data && S.data.seq, state: S.data }, 3);
+      if (r.stale) { S.saving = false; return otherTab(); }
+      showSaved('ok');
+    } catch (e) { showSaved('bad'); setTimeout(() => sync(), 15000); }
+    S.saving = false;
+    if (S.again) { S.again = false; sync(); }
+  }
+  async function waitIdle() { for (let i = 0; i < 100 && S.saving; i++) await sleep(100); }
+  function showSaved(st) {
+    S.saveState = st;
+    const el = document.querySelector('.saved'); if (!el) return;
+    el.className = 'saved' + (st === 'bad' ? ' bad' : '');
+    el.textContent = PREVIEW ? 'Preview: nothing is saved' : st === 'saving' ? 'Saving…' : st === 'bad' ? 'Not saved yet: check your connection. Retrying…' : 'Your answers are saved as you go.';
+  }
+
+  /* ---------- page furniture ---------- */
+  function message(title, html, extra) {
+    document.title = title;
+    root.innerHTML = '';
+    if (PREVIEW) root.append(previewBar());
+    root.append(h('div', { class: 'msg' }, h('h1', null, title), h('div', { class: 'body', html }), extra || null));
+  }
+  function frame(kicker, opts = {}) {
+    root.innerHTML = '';
+    if (PREVIEW) root.append(previewBar());
+    if (opts.method && opts.method.source === 'preview') root.append(h('div', { class: 'banner', role: 'note', html: '<b>Preview content.</b> This method text is paraphrased for testing. Import the ReMeDe page in the editor before collecting data.' }));
+    const all = steps(), at = Math.max(0, all.indexOf(S.step));
+    const header = h('header', { class: 'bar' },
+      h('div', { class: 'bar-in' }, h('div', { class: 'kicker', html: kicker })),
+      h('div', { class: 'prog', 'aria-hidden': 'true' }, h('i', { style: `width:${Math.round(100 * at / (all.length - 1))}%` })));
+    root.append(header);
+    return header;
+  }
+  function footer() {
+    const f = h('div', { class: 'foot' }, h('span', { class: 'saved' }));
+    if (S.pid || PREVIEW) f.append(h('button', { type: 'button', onclick: withdrawDialog }, 'Withdraw from the study'));
+    root.append(f); showSaved(S.saveState);
+  }
+  function go(step) {
+    S.step = step;
+    if (S.data) S.data.step = step;
+    persist(); sync(); render(); window.scrollTo(0, 0);
+  }
+  function withdrawDialog() {
+    const box = h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'wd-t' });
+    const err = h('p', { class: 'formerr' });
+    const yes = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
+      yes.disabled = true; err.textContent = '';
+      try {
+        if (!PREVIEW) await api('withdraw', { pid: S.pid, token: S.token }, 2);
+        ls.del(KEY()); box.remove(); S.pid = ''; S.data = null;
+        message('You have withdrawn', md(T().withdrawn));
+      } catch (e) { err.textContent = e.message; yes.disabled = false; }
+    } }, 'Withdraw and delete my answers');
+    box.append(h('div', { class: 'card' }, h('h2', { id: 'wd-t' }, 'Withdraw from the study?'),
+      h('p', null, 'Everything you have entered will be deleted. This cannot be undone.'),
+      h('div', { class: 'row' }, yes, h('button', { class: 'btn quiet', type: 'button', onclick: () => box.remove() }, 'Keep going')), err));
+    document.body.append(box); yes.focus();
+  }
+
+  /* ---------- questionnaire items ---------- */
+  function visibleItems(list) {
+    return (list || []).filter(it => (!it.groups || !it.groups.length || it.groups.includes(S.group)) && !(it.when === 'pages' && S.pilot === 'nopage'));
+  }
+  function scale(name, points, value, onpick, labels) {
+    const box = h('div', { class: 'scale', role: 'radiogroup', 'aria-label': labels || name });
+    for (let i = 1; i <= points; i++) {
+      const inp = h('input', { type: 'radio', name, value: String(i), checked: Number(value) === i, onchange: () => onpick(i) });
+      box.append(h('label', { title: String(i) }, inp, h('span', { class: 'n' }, String(i))));
+    }
+    return box;
+  }
+  function likertItem(it, store, key) {
+    const name = 'f-' + key;
+    const wrap = h('fieldset', { class: 'item', 'data-var': key });
+    wrap.append(h('legend', null, it.t));
+    wrap.append(scale(name, it.points || 7, store[key], v => { store[key] = v; wrap.classList.remove('bad'); noteTyping(); }, it.t));
+    const pts = it.points || 7;
+    wrap.append(h('div', { class: 'ends' }, ['1 = ' + it.lo].concat(it.mid ? [Math.ceil(pts / 2) + ' = ' + it.mid] : [], [pts + ' = ' + it.hi]).join('  ·  ')));
+    wrap.append(h('div', { class: 'err' }, 'Please choose a number.'));
+    wrap._check = () => store[key] != null;
+    return wrap;
+  }
+  function renderItem(it, store) {
+    const v = it.var;
+    if (it.type === 'note') return h('div', { class: 'item' }, h('div', { class: 'note', html: inline(it.t) }));
+    if (it.type === 'likert') { const w = likertItem(it, store, v); w._req = it.req !== false; return w; }
+    const choice = it.type === 'single' || it.type === 'multi', grid = it.type === 'methodgrid' || it.type === 'cvr';
+    const wrap = h(choice ? 'fieldset' : 'div', { class: 'item', 'data-var': v });
+    const label = choice ? h('legend', null, it.t) : grid ? h('div', { class: 't' }, it.t) : h('label', { class: 't', for: 'f-' + v }, it.t);
+    wrap.append(label);
+    if (it.note && !grid) wrap.append(h('div', { class: 'note', html: inline(it.note) }));
+    const touched = () => { wrap.classList.remove('bad'); noteTyping(); };
+    if (it.type === 'single') {
+      const other = it.other ? h('input', { class: 'txt other', type: 'text', 'aria-label': 'Other, please say', value: store[v + '_other'] || '', oninput: e => { store[v + '_other'] = e.target.value; touched(); } }) : null;
+      (it.options || []).concat(it.other ? ['Other'] : []).forEach(o => {
+        const inp = h('input', { type: 'radio', name: 'f-' + v, value: o, checked: store[v] === o, onchange: () => { store[v] = o; touched(); } });
+        wrap.append(h('label', { class: 'opt' }, inp, h('span', { class: 'let', 'aria-hidden': 'true' }), h('span', null, o)));
+      });
+      if (other) wrap.append(other);
+      wrap._check = () => !!store[v] && (store[v] !== 'Other' || !!String(store[v + '_other'] || '').trim());
+    } else if (it.type === 'multi') {
+      const boxes = [];
+      (it.options || []).forEach(o => {
+        const inp = h('input', { type: 'checkbox', value: o, checked: (store[v] || []).includes(o), onchange: () => {
+          let cur = (store[v] || []).filter(x => x !== o);
+          if (inp.checked) { cur.push(o); if (it.exclusive === o) cur = [o]; else cur = cur.filter(x => x !== it.exclusive); }
+          store[v] = cur; boxes.forEach(b => { b.checked = cur.includes(b.value); }); touched();
+        } });
+        boxes.push(inp);
+        wrap.append(h('label', { class: 'opt' }, inp, h('span', { class: 'box', 'aria-hidden': 'true' }), h('span', null, o)));
+      });
+      wrap._check = () => (store[v] || []).length > 0;
+    } else if (it.type === 'number') {
+      wrap.append(h('input', { class: 'num', id: 'f-' + v, type: 'number', inputmode: 'numeric', min: it.min, max: it.max, step: 1, value: store[v] ?? '', oninput: e => { store[v] = e.target.value === '' ? null : Number(e.target.value); touched(); } }));
+      wrap._check = () => store[v] != null && Number.isFinite(store[v]) && (it.min == null || store[v] >= it.min) && (it.max == null || store[v] <= it.max);
+    } else if (it.type === 'text' || it.type === 'textarea') {
+      const f = it.type === 'text' ? h('input', { class: 'txt', id: 'f-' + v, type: 'text' }) : h('textarea', { id: 'f-' + v, class: 'short' });
+      f.value = store[v] || '';
+      f.addEventListener('input', e => { store[v] = e.target.value; touched(); });
+      wrap.append(f);
+      wrap._check = () => !!String(store[v] || '').trim();
+    } else if (it.type === 'methodgrid' || it.type === 'cvr') {
+      wrap.classList.add('grid');
+      if (it.type === 'cvr' && it.intro) wrap.append(h('p', { class: 'note', html: inline(fill(it.intro)) }));
+      wrap.append(h('div', { class: 'legend' }, it.note || ('1 = ' + it.lo + ' · ' + (it.points || 3) + ' = ' + it.hi)));
+      const rows = it.type === 'methodgrid'
+        ? C().methods.filter(m => C().pairs.some(p => p.methods.includes(m.id))).map(m => ({ key: v + '_' + m.id, label: esc(m.name) }))
+        : C().elements.map((e, i) => ({ key: v + String(i + 1).padStart(2, '0'), label: '<b>' + esc(e.name) + '</b>: ' + esc(e.desc) }));
+      if (it.type === 'cvr' && it.attn) rows.splice(it.attn.after, 0, { key: it.attn.var, label: esc(it.attn.t), attn: true });
+      const pts = it.points || 3;
+      const rowEls = rows.map(r => {
+        const g = h('div', { class: 'grow', 'data-var': r.key });
+        g.append(h('div', { class: 'gl', html: r.label }));
+        g.append(scale('f-' + r.key, pts, store[r.key], x => { store[r.key] = x; g.classList.remove('bad'); touched(); }, r.label.replace(/<[^>]+>/g, '')));
+        wrap.append(g); return { r, g };
+      });
+      wrap._check = () => { let all = true; rowEls.forEach(({ r, g }) => { const ok = store[r.key] != null; g.classList.toggle('bad', !ok); if (!ok) all = false; }); return all; };
+    }
+    wrap._req = it.req !== false;
+    wrap.append(h('div', { class: 'err' }, it.type === 'cvr' || it.type === 'methodgrid' ? 'Please answer every row.' : 'Please answer this question.'));
+    return wrap;
+  }
+  function validate(items) {
+    let first = null;
+    items.forEach(w => {
+      if (!w._check || !w._req) return;
+      const ok = w._check(); w.classList.toggle('bad', !ok);
+      if (!ok && !first) first = w;
+    });
+    if (first) { first.scrollIntoView({ block: 'center', behavior: 'smooth' }); const f = first.querySelector('input, textarea'); if (f) f.focus({ preventScroll: true }); }
+    return !first;
+  }
+
+  /* ---------- steps ---------- */
+  function render() {
+    document.body.dataset.tab = 'method';
+    const st = S.step;
+    if (st === 'consent') return renderConsent();
+    if (st === 'info') return renderInfo();
+    if (st === 'about') return renderForm('about', C().about, S.data.about, T().aboutTitle, T().aboutIntro, () => { S.data.t.about = Date.now(); go(next()); });
+    if (st === 'between') return renderBetween();
+    if (st === 'views') return renderForm('views', C().views, S.data.views, T().viewsTitle, T().viewsIntro, submit, 'Submit my answers');
+    if (st === 'end') return message(T().endTitle, md(fill(T().endMessage)));
+    const m = /^b([12])([abc])$/.exec(st);
+    if (m) return renderBlock(Number(m[1]) - 1, m[2]);
+  }
+  const next = () => steps()[steps().indexOf(S.step) + 1];
+
+  function renderConsent() {
+    document.title = T().consentTitle;
+    frame('<b>' + esc(C().title) + '</b>');
+    const main = h('main', { class: 'single' });
+    const card = h('div', { class: 'card' }, h('h1', null, T().consentTitle), h('div', { class: 'body', html: md(fill(T().consent)) }));
+    const ticks = T().checks.map(t => h('input', { type: 'checkbox' }));
+    const agree = h('button', { class: 'btn primary', type: 'button', disabled: true }, 'I agree: start the study');
+    ticks.forEach(c => c.addEventListener('change', () => { agree.disabled = !ticks.every(x => x.checked); }));
+    card.append(h('div', { class: 'checks' }, T().checks.map((t, i) => h('label', { class: 'opt' }, ticks[i], h('span', { class: 'box', 'aria-hidden': 'true' }), h('span', null, t)))));
+    const err = h('p', { class: 'formerr', role: 'alert' });
+    const decline = h('button', { class: 'btn quiet', type: 'button', onclick: () => message('Thank you', md(T().declined)) }, 'I do not want to take part');
+    agree.addEventListener('click', async () => {
+      agree.disabled = true; err.textContent = '';
+      try { await join(); S.data.consent = { at: Date.now(), checks: ticks.map(x => x.checked) }; S.data.t.consent = Date.now(); channel(); go('info'); }
+      catch (e) { err.textContent = e.message; agree.disabled = false; }
+    });
+    card.append(h('div', { class: 'row' }, agree, decline), err);
+    main.append(card); root.append(main);
+  }
+  async function join() {
+    if (PREVIEW) {
+      S.cond = Q.get('c') || S.cond || C().pairs[0].id + '1';
+      S.pid = 'PREVIEW'; S.data = newData(); S.data.blocks = blocksFor(S.cond).map(b => Object.assign(b, { answers: {}, t: {}, hidden_ms: 0 }));
+      return;
+    }
+    const r = await api('join', { group: S.group, pilot: S.pilot, token: S.token = S.token || token() }, 3);
+    if (r.closed) throw new Error(T().closed);
+    if (r.full) throw new Error(T().full);
+    S.pid = r.pid; S.cond = r.condition;
+    if (r.version !== S.version) { const c = await api('content', { v: r.version }); S.content = c.content; S.version = c.version; }
+    S.data = newData(); S.data.pid = S.pid; S.data.condition = S.cond; S.data.version = S.version;
+    S.data.blocks = blocksFor(S.cond).map(b => Object.assign(b, { answers: {}, t: {}, hidden_ms: 0 }));
+  }
+  function renderInfo() {
+    document.title = T().infoTitle;
+    frame('<b>' + esc(C().title) + '</b>');
+    const main = h('main', { class: 'single' });
+    main.append(h('div', { class: 'card' }, h('h1', null, T().infoTitle), h('div', { class: 'body', html: md(fill(T().info)) }),
+      h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'button', onclick: () => { S.data.t.info = Date.now(); go('about'); } }, 'Start'))));
+    root.append(main); footer();
+  }
+  function renderForm(kind, list, store, title, intro, done, label) {
+    document.title = title;
+    frame('<b>' + esc(title) + '</b>');
+    const main = h('main', { class: 'single' });
+    const card = h('div', { class: 'card' }, h('h1', null, title), intro ? h('p', { class: 'lead' }, intro) : null);
+    const items = visibleItems(list).map(it => renderItem(it, store));
+    const form = h('div', { class: 'items' }, items);
+    const err = h('p', { class: 'formerr', role: 'alert' });
+    const btn = h('button', { class: 'btn primary', type: 'button' }, label || 'Continue');
+    btn.addEventListener('click', async () => {
+      if (!validate(items)) { err.textContent = 'Some answers are missing; they are marked in red.'; return; }
+      err.textContent = ''; btn.disabled = true;
+      try { await done(); } catch (e) { err.textContent = e.message; btn.disabled = false; }
+    });
+    card.append(form, h('div', { class: 'row' }, btn), err);
+    main.append(card); root.append(main); footer();
+  }
+  function renderBetween() {
+    document.title = 'Next method';
+    frame('<b>Method 2 of 2</b>');
+    const main = h('main', { class: 'single' });
+    main.append(h('div', { class: 'card' }, h('p', null, T().between), h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'button', onclick: () => go(next()) }, 'Continue'))));
+    root.append(main); footer();
+  }
+  async function submit() {
+    S.data.t.views = Date.now();
+    if (PREVIEW) { S.step = 'end'; render(); return; }
+    clearTimeout(typingTimer); await waitIdle();
+    if (S.stopped) return;
+    const r = await api('submit', { pid: S.pid, token: S.token, seq: S.data.seq, state: S.data }, 3);
+    if (r.stale) return otherTab();
+    S.step = 'end'; ls.set(KEY(), { done: true, pid: S.pid }); render(); window.scrollTo(0, 0);
+  }
+
+  /* ---------- a method block: the page on the left, the current part on the right ---------- */
+  function methodArticle(m, format) {
+    const art = h('article', { class: 'method', 'aria-label': 'Method description' }, h('h1', null, m.name), h('p', { class: 'sub' }, 'Design method'));
+    if (format === 'none') { art.append(h('div', { class: 'nopage' }, T().nopage)); return art; }
+    const sec = (title, html) => { const s = h('section', null, h('h2', null, title)); s.append(h('div', { html: clean(html) })); art.append(s); };
+    if (format === 'is') C().elements.forEach(e => sec(e.name, (m.elements || {})[e.name]));
+    else C().core.forEach(c => sec(c.heading, c.elements.map(n => (m.elements || {})[n] || '').join('')));
+    return art;
+  }
+  function renderBlock(k, part) {
+    const b = S.data.blocks[k], m = C().methods.find(x => x.id === b.method);
+    if (!m) return message('Something is wrong with this study', '<p>The method for this part is missing. Please tell the researcher.</p>');
+    if (!b.t.start) { b.t.start = Date.now(); persist(); }
+    const parts = teach() ? 3 : 2, idx = 'abc'.indexOf(part) + 1;
+    document.title = m.name;
+    const header = frame(`<b>Method ${k + 1} of 2</b> &nbsp;·&nbsp; Part ${idx} of ${parts}`, { method: m });
+    const label = part === 'a' ? 'Questions' : part === 'b' ? 'Task' : 'Teaching';
+    const tabs = h('div', { class: 'tabs', role: 'tablist', 'aria-label': 'Sections of this page' });
+    [['method', 'Method'], ['work', label]].forEach(([key, text]) => {
+      const bt = h('button', { type: 'button', role: 'tab', 'aria-selected': key === 'method' ? 'true' : 'false' }, text);
+      bt.dataset.k = key;
+      bt.addEventListener('click', () => { setTab(key); window.scrollTo(0, 0); });
+      tabs.append(bt);
+    });
+    header.append(tabs);
+    const main = h('main', { class: 'split' });
+    main.append(h('div', { class: 'pane pane-method' }, methodArticle(m, b.format)));
+    const panel = h('aside', { class: 'panel', 'aria-label': label });
+    const card = h('section', { class: 'card task' });
+    const items = [];
+    if (part === 'a') {
+      card.append(h('h2', null, T().partATitle), h('p', { class: 'lead' }, T().partAIntro));
+      m.questions.forEach((q, i) => {
+        const fs = h('fieldset', { class: 'item q', 'data-var': q.id }, h('legend', null, (i + 1) + '. ' + q.stem));
+        q.options.forEach((o, j) => {
+          const L = 'ABCD'[j];
+          fs.append(h('label', { class: 'opt' }, h('input', { type: 'radio', name: 'q-' + q.id, value: L, checked: b.answers[q.id] === L, onchange: () => { b.answers[q.id] = L; fs.classList.remove('bad'); noteTyping(); } }),
+            h('span', { class: 'let', 'aria-hidden': 'true' }, L), h('span', null, o)));
+        });
+        fs.append(h('div', { class: 'err' }, 'Please choose an answer.'));
+        fs._req = true; fs._check = () => !!b.answers[q.id];
+        card.append(fs); items.push(fs);
+      });
+      const e = likertItem(Object.assign({ points: 7 }, T().ease), b, 'ease'); e._req = true; card.append(e); items.push(e);
+    } else if (part === 'b') {
+      card.append(h('h2', null, T().partBTitle), h('p', { class: 'instr' }, T().partB), h('div', { html: clean(T().scenario, true) }), h('div', { html: clean(m.input, true) }));
+      items.push(textItem(T().workLabel, b, 'work', ''));
+      card.append(items[0]);
+      [['conf', T().conf], ['useful', T().useful]].forEach(([key, t]) => { const e = likertItem(Object.assign({ points: 7 }, t), b, key); e._req = true; card.append(e); items.push(e); });
+    } else {
+      card.append(h('h2', null, T().partCTitle), h('p', { class: 'lead' }, T().partCIntro));
+      [['plan', T().plan], ['mistake', T().mistake]].forEach(([key, t]) => { const e = textItem(t, b, key, 'short'); card.append(e); items.push(e); });
+      const e = likertItem(Object.assign({ points: 7 }, T().teachuse), b, 'teachuse'); e._req = true; card.append(e); items.push(e);
+    }
+    const err = h('p', { class: 'formerr', role: 'alert' });
+    const btn = h('button', { class: 'btn primary', type: 'button' }, 'Continue');
+    btn.addEventListener('click', () => {
+      if (!validate(items)) { err.textContent = 'Some answers are missing; they are marked in red.'; setTab('work'); return; }
+      b.t[part] = Date.now(); go(next());
+    });
+    card.append(h('div', { class: 'row' }, btn), err);
+    panel.append(card); main.append(panel); root.append(main); footer();
+  }
+  function setTab(key) {
+    document.body.dataset.tab = key;
+    document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x.dataset.k === key ? 'true' : 'false'));
+  }
+  function textItem(label, store, key, cls) {
+    const id = 'f-' + key;
+    const w = h('div', { class: 'item', 'data-var': key }, h('label', { class: 't', for: id }, label));
+    const f = h('textarea', { id, class: cls || '' }); f.value = store[key] || '';
+    f.addEventListener('input', () => { store[key] = f.value; w.classList.remove('bad'); noteTyping(); });
+    w.append(f, h('div', { class: 'err' }, 'Please write something here.'));
+    w._req = true; w._check = () => !!String(store[key] || '').trim();
+    return w;
+  }
+  document.addEventListener('visibilitychange', () => {
+    const m = /^b([12])/.exec(S.step || ''); if (!m || !S.data) return;
+    const b = S.data.blocks[Number(m[1]) - 1]; if (!b) return;
+    if (document.hidden) S.hiddenAt = Date.now();
+    else if (S.hiddenAt) { b.hidden_ms = (b.hidden_ms || 0) + Date.now() - S.hiddenAt; S.hiddenAt = 0; persist(); }
+  });
+
+  /* ---------- preview from the editor ---------- */
+  function previewBar() {
+    const bar = h('div', { class: 'pv', role: 'note' }, h('b', null, 'Preview'), h('span', null, 'Nothing is saved.'));
+    const sel = (label, val, opts, on) => {
+      const s = h('select', { 'aria-label': label, onchange: e => on(e.target.value) }, opts.map(([v, t]) => h('option', { value: v, selected: v === val }, t)));
+      bar.append(h('label', null, label + ' ', s));
+    };
+    const conds = C().pairs.flatMap(p => [p.id + '1', p.id + '2']);
+    const reload = (k, v) => { const u = new URL(location.href); u.searchParams.set(k, v); if (k !== 'step') u.searchParams.delete('step'); location.href = u.toString(); };
+    sel('Group', S.group, C().groups.map(g => [g.id, g.label]), v => reload('g', v));
+    sel('Condition', S.cond || conds[0], conds.map(c => { const bl = blocksFor(c); return [c, c + ': ' + bl.map(b => (C().methods.find(m => m.id === b.method) || {}).name + ' ' + (b.format === 'is' ? 'IS' : b.format === 'core' ? 'core' : 'no page')).join(', ')]; }), v => reload('c', v));
+    sel('Pilot', S.pilot, [['', 'none'], ['1', 'pilot'], ['nopage', 'no-page pilot']], v => reload('pilot', v));
+    sel('Jump to', S.step, steps().map(s => [s, s]), v => reload('step', v));
+    return bar;
+  }
+
+  /* ---------- start ---------- */
+  async function start() {
+    if (PREVIEW) {
+      S.content = ls.get('is-study-preview');
+      if (!S.content) return message('Nothing to preview', '<p>Open the preview from the study editor.</p>');
+      S.version = S.content.version || 0;
+      if (!G()) S.group = S.content.groups[0].id;
+      S.cond = Q.get('c') || S.content.pairs[0].id + '1';
+      await join();
+      const want = Q.get('step');
+      if (Q.get('m')) {   // one method page in one format, from the editor's page review
+        const f = Q.get('f') || 'is';
+        S.data.blocks[0] = { method: Q.get('m'), format: f, answers: {}, t: {}, hidden_ms: 0 };
+        S.step = 'b1a';
+      } else if (want && steps().includes(want)) S.step = want;
+      return render();
+    }
+    if (!BACKEND || !S.group) return message('This link is incomplete', '<p>Please check that you copied the whole study link.</p>');
+    root.innerHTML = '<div class="msg" role="status"><p>Loading the study…</p></div>';
+    let c;
+    try { c = await api('content', {}, 3); }
+    catch (e) { return message('The study could not be loaded', '<p>' + esc(e.message) + '</p>', h('button', { class: 'btn', onclick: () => location.reload() }, 'Try again')); }
+    if (c.status === 'empty') return message('This study is not open yet', '<p>Please try again later.</p>');
+    S.content = c.content; S.version = c.version;
+    if (!G()) return message('This link is incomplete', '<p>Please check that you copied the whole study link.</p>');
+    S.status = c.status;
+    const saved = ls.get(KEY());
+    if (saved && saved.done) return doneMessage();
+    if (saved && saved.pid && saved.token) {
+      let r = null;
+      try { r = await api('hello', { pid: saved.pid, token: saved.token }, 3); }
+      catch (e) {
+        if (!/not recognised/i.test(e.message)) return message('The study could not be loaded', '<p>' + esc(e.message) + '</p><p>Your answers so far are kept in this browser.</p>', h('button', { class: 'btn', onclick: () => location.reload() }, 'Try again'));
+        ls.del(KEY());
+      }
+      if (r && r.status === 'completed') { ls.set(KEY(), { done: true, pid: saved.pid }); return doneMessage(); }
+      if (r && (r.status === 'started' || r.status === 'in progress')) {
+        if (await othersOpen()) return renderElsewhere(saved, r);
+        return renderWelcomeBack(saved, r);
+      }
+      if (r) ls.del(KEY());   // withdrawn: start afresh
+    }
+    startFresh();
+  }
+  function startFresh() {
+    ls.del(KEY()); S.pid = ''; S.token = ''; S.data = null; S.cond = ''; S.stopped = false;
+    if (S.status === 'closed') return message('This study is closed', md(T().closed));
+    S.step = 'consent'; render();
+  }
+  function doneMessage() {
+    message('You have already taken part', '<p>This browser has already completed this study. Thank you!</p>',
+      h('button', { class: 'btn quiet', type: 'button', onclick: startFresh }, 'Someone else on this computer? Start as a new participant'));
+  }
+  async function resume(saved, r) {
+    try {
+      if (r.version !== S.version) { const v = await api('content', { v: r.version }, 3); S.content = v.content; S.version = v.version; }
+    } catch (e) { return message('The study could not be loaded', '<p>' + esc(e.message) + '</p><p>Your answers so far are kept in this browser.</p>', h('button', { class: 'btn', onclick: () => location.reload() }, 'Try again')); }
+    S.pid = saved.pid; S.token = saved.token; S.cond = saved.cond || r.condition; S.stopped = false;
+    S.data = saved.data || r.state || null;
+    S.step = saved.step || r.step || 'info';
+    if (!S.data || !(S.data.blocks || []).length) {   // nothing usable kept: begin again after consent
+      S.data = newData(); S.data.pid = S.pid; S.data.condition = S.cond; S.data.version = S.version;
+      S.data.blocks = blocksFor(S.cond).map(b => Object.assign(b, { answers: {}, t: {}, hidden_ms: 0 }));
+      S.step = 'info';
+    }
+    if (S.step === 'consent') S.step = 'info';
+    channel(); render();
+  }
+  function renderWelcomeBack(saved, r) {
+    document.title = 'Welcome back';
+    frame('<b>' + esc(C().title) + '</b>');
+    root.append(h('main', { class: 'single' }, h('div', { class: 'card' }, h('h1', null, 'Welcome back'),
+      h('p', null, 'This browser has an unfinished session of this study (participant ' + saved.pid + '). Is that you?'),
+      h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'button', onclick: () => resume(saved, r) }, 'Yes, continue where I left off'),
+        h('button', { class: 'btn quiet', type: 'button', onclick: startFresh }, 'No, I am someone else: start as a new participant')))));
+  }
+  function renderElsewhere(saved, r) {
+    document.title = 'Already open';
+    frame('<b>' + esc(C().title) + '</b>');
+    root.append(h('main', { class: 'single' }, h('div', { class: 'card' }, h('h1', null, 'This study is already open in another tab'),
+      h('p', null, 'Please carry on in that tab. If you closed it or would rather use this one, continue here; the other tab will stop.'),
+      h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'button', onclick: () => { channel() && chan.postMessage({ type: 'take', tab: TAB, pid: saved.pid }); resume(saved, r); } }, 'Continue here instead')))));
+  }
+  /* ---------- one tab at a time ---------- */
+  const TAB = Math.random().toString(36).slice(2);
+  let chan = null;
+  function channel() {
+    if (chan || PREVIEW || !('BroadcastChannel' in window)) return chan;
+    chan = new BroadcastChannel(KEY());
+    chan.onmessage = e => {
+      const m = e.data || {};
+      if (m.tab === TAB) return;
+      if (m.type === 'ping' && S.pid && !S.stopped) chan.postMessage({ type: 'here', tab: TAB, pid: S.pid });
+      if (m.type === 'take' && m.pid === S.pid && !S.stopped) otherTab();
+    };
+    return chan;
+  }
+  function othersOpen() {
+    return new Promise(res => {
+      const c = channel(); if (!c) return res(false);
+      let seen = false;
+      const on = e => { if ((e.data || {}).type === 'here') seen = true; };
+      c.addEventListener('message', on);
+      c.postMessage({ type: 'ping', tab: TAB });
+      setTimeout(() => { c.removeEventListener('message', on); res(seen); }, 350);
+    });
+  }
+  function otherTab() {
+    S.stopped = true; clearTimeout(typingTimer);
+    message('Continued in another tab', '<p>This study is open in another tab or window, and your answers are saved there. You can close this tab.</p>');
+  }
+  window.__study = S;   // read by the automated tests
+  start();
+})();
+</script>
+</body>
+</html>

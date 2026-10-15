@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Study editor</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f3ef; --paper: #fff; --ink: #1d1d1b; --ink-2: #4a4945; --ink-3: #6d6b66; --rule: #e2dfd8; --rule-2: #cfcbc2;
+  --accent: #1f5f8b; --accent-soft: #e8f0f6; --warn: #8a1c1c; --warn-soft: #fbeaea; --ok: #1e6b3a; --ok-soft: #e7f3eb; --amber: #7a5a00; --amber-soft: #fff4d6;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); }
+a { color: var(--accent); }
+button, input, select, textarea { font: inherit; color: inherit; }
+header.top { position: sticky; top: 0; z-index: 10; background: #1d1d1b; color: #fff; display: flex; align-items: center; gap: 14px; padding: 10px 18px; flex-wrap: wrap; }
+header.top h1 { font-size: 16px; margin: 0; font-weight: 650; letter-spacing: .01em; }
+.pill { font-size: 12.5px; padding: 3px 9px; border-radius: 999px; background: #3a3a37; color: #e9e7e1; white-space: nowrap; }
+.pill.ok { background: #1e4d33; color: #d6f0df; }
+.pill.bad { background: #6b1f1f; color: #fbe1e1; }
+.pill.amber { background: #5c4600; color: #fff0c2; }
+header.top .sp { flex: 1; }
+header.top button { background: #fff; color: #1d1d1b; border: 0; border-radius: 7px; padding: 7px 12px; font-weight: 600; cursor: pointer; font-size: 13.5px; }
+header.top button.ghost { background: transparent; color: #fff; border: 1px solid #5a5a55; }
+.layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: calc(100vh - 50px); }
+nav.side { border-right: 1px solid var(--rule); background: #efeee9; padding: 14px 10px; position: sticky; top: 50px; align-self: start; max-height: calc(100vh - 50px); overflow: auto; }
+nav.side button { display: flex; width: 100%; text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 7px; cursor: pointer; color: var(--ink-2); font-size: 14px; justify-content: space-between; gap: 6px; }
+nav.side button:hover { background: #e4e2dc; }
+nav.side button.on { background: #1d1d1b; color: #fff; }
+nav.side .sub { padding-left: 22px; font-size: 13px; }
+nav.side .badge { font-size: 11.5px; background: var(--warn); color: #fff; border-radius: 999px; padding: 0 7px; line-height: 18px; }
+nav.side .badge.amber { background: #b58900; }
+nav.side hr { border: 0; border-top: 1px solid var(--rule); margin: 8px 4px; }
+main { padding: 22px 28px 80px; max-width: 1060px; min-width: 0; }
+main h2 { font-size: 22px; margin: 0 0 4px; }
+main h3 { font-size: 16px; margin: 22px 0 6px; }
+.lead { color: var(--ink-2); margin: 0 0 16px; max-width: 760px; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; margin: 0 0 14px; }
+.card h4 { margin: 0 0 8px; font-size: 14.5px; }
+.fld { margin: 0 0 12px; }
+.fld > label, .fld > .lab { display: block; font-size: 13px; color: var(--ink-3); margin: 0 0 4px; font-weight: 600; }
+.fld .hint { font-size: 12.5px; color: var(--ink-3); margin-top: 3px; }
+input.in, select.in, textarea.in { width: 100%; padding: 7px 9px; border: 1px solid var(--rule-2); border-radius: 7px; background: #fff; }
+textarea.in { min-height: 70px; resize: vertical; line-height: 1.45; }
+textarea.in.tall { min-height: 220px; }
+textarea.in.mono, input.in.mono { font: 12.5px/1.45 var(--mono); }
+input.in:focus, select.in:focus, textarea.in:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 14px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 12px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { font-weight: 600; font-size: 13.5px; padding: 7px 12px; border-radius: 7px; border: 1px solid #3a3a37; background: #fff; cursor: pointer; text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+.btn.primary { background: #1d1d1b; color: #fff; border-color: #1d1d1b; }
+.btn.danger { border-color: var(--warn); color: var(--warn); }
+.btn.danger.primary { background: var(--warn); color: #fff; }
+.btn.quiet { border-color: var(--rule-2); color: var(--ink-2); }
+.btn.sm { padding: 4px 9px; font-size: 12.5px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.iconbtn { border: 1px solid var(--rule-2); background: #fff; border-radius: 6px; width: 28px; height: 28px; cursor: pointer; display: inline-grid; place-items: center; font-size: 13px; color: var(--ink-2); }
+.iconbtn:hover { background: #f1f0eb; }
+.tabs2 { display: flex; gap: 4px; border-bottom: 1px solid var(--rule); margin: 0 0 14px; flex-wrap: wrap; }
+.tabs2 button { border: 0; background: none; padding: 8px 12px; cursor: pointer; color: var(--ink-3); font-weight: 600; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs2 button.on { color: var(--ink); border-bottom-color: var(--ink); }
+.note { font-size: 13px; color: var(--ink-3); }
+.msg { padding: 10px 12px; border-radius: 8px; font-size: 13.5px; margin: 0 0 12px; }
+.msg.ok { background: var(--ok-soft); color: var(--ok); }
+.msg.bad { background: var(--warn-soft); color: var(--warn); }
+.msg.amber { background: var(--amber-soft); color: var(--amber); }
+.msg.info { background: var(--accent-soft); color: #164766; }
+table.t { border-collapse: collapse; width: 100%; font-size: 13px; background: #fff; }
+table.t th, table.t td { border: 1px solid var(--rule); padding: 5px 7px; text-align: left; vertical-align: top; }
+table.t th { background: #faf9f6; font-weight: 600; }
+table.t td.c { text-align: center; }
+.scroll { overflow-x: auto; }
+code, .mono { font-family: var(--mono); font-size: 12.5px; }
+.linkbox { display: flex; gap: 6px; align-items: center; margin: 4px 0; }
+.linkbox input { flex: 1; font: 12px var(--mono); padding: 6px 8px; border: 1px solid var(--rule-2); border-radius: 6px; background: #faf9f6; }
+.chip { display: inline-block; font-size: 11.5px; padding: 1px 7px; border-radius: 999px; background: #ecebe6; color: var(--ink-2); margin-left: 6px; font-weight: 600; vertical-align: 1px; }
+.chip.preview { background: var(--warn-soft); color: var(--warn); }
+.chip.remede { background: var(--ok-soft); color: var(--ok); }
+.chip.edited { background: var(--accent-soft); color: var(--accent); }
+.qcard { border: 1px solid var(--rule); border-radius: 9px; padding: 12px 14px; margin: 0 0 12px; background: #fff; }
+.qcard.off { background: #f7f6f2; }
+.qcard.off .qbody { opacity: .65; }
+.qhead { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.qhead .grow { flex: 1; }
+.qhead label { font-size: 13px; color: var(--ink-2); display: inline-flex; gap: 5px; align-items: center; }
+.opt-row { display: grid; grid-template-columns: 34px 1fr; gap: 6px; align-items: center; margin: 4px 0; }
+.opt-row label.key { display: inline-flex; align-items: center; gap: 3px; font-weight: 700; font-size: 13px; cursor: pointer; }
+.opt-row.right input.in { border-color: var(--ok); background: #f4fbf6; }
+.lenbar { font-size: 11.5px; color: var(--ink-3); }
+.rich { border: 1px solid var(--rule-2); border-radius: 8px; background: #fff; }
+.rbar { display: flex; gap: 3px; padding: 4px; border-bottom: 1px solid var(--rule); flex-wrap: wrap; background: #faf9f6; border-radius: 8px 8px 0 0; align-items: center; }
+.rbar button { border: 1px solid transparent; background: none; border-radius: 5px; padding: 2px 8px; cursor: pointer; font-size: 13px; color: var(--ink-2); min-width: 28px; }
+.rbar button:hover { background: #ecebe6; }
+.rbar button.on { border-color: var(--rule-2); background: #fff; }
+.rbar .sp { flex: 1; }
+.rbar input { font: 12.5px var(--sans); padding: 3px 6px; border: 1px solid var(--rule-2); border-radius: 5px; width: 260px; }
+.rarea { min-height: 70px; padding: 9px 12px; outline: none; line-height: 1.55; }
+.rarea:focus { box-shadow: inset 0 0 0 2px var(--accent-soft); }
+.rarea p { margin: 0 0 8px; } .rarea ul, .rarea ol { margin: 0 0 8px; padding-left: 22px; } .rarea h3 { font-size: 14.5px; margin: 8px 0 4px; }
+.rarea table { border-collapse: collapse; } .rarea td, .rarea th { border: 1px solid var(--rule-2); padding: 3px 6px; }
+.rcode { width: 100%; min-height: 160px; border: 0; padding: 9px 12px; font: 12.5px/1.5 var(--mono); resize: vertical; border-radius: 0 0 8px 8px; }
+.elhead { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 16px 0 5px; }
+.elhead h4 { margin: 0; font-size: 14.5px; }
+.elhead .note { font-size: 12px; }
+.check { display: grid; grid-template-columns: 70px 1fr auto; gap: 8px; align-items: start; padding: 7px 0; border-top: 1px solid var(--rule); font-size: 13.5px; }
+.check:first-child { border-top: 0; }
+.lvl { font-size: 11.5px; font-weight: 700; padding: 1px 6px; border-radius: 5px; text-align: center; }
+.lvl.error { background: var(--warn-soft); color: var(--warn); }
+.lvl.warn { background: var(--amber-soft); color: var(--amber); }
+.lvl.ok { background: var(--ok-soft); color: var(--ok); }
+.stat { display: inline-block; margin: 0 14px 6px 0; font-size: 13px; }
+.stat b { font-size: 18px; display: block; line-height: 1.2; }
+.toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #1d1d1b; color: #fff; padding: 9px 16px; border-radius: 9px; font-size: 13.5px; z-index: 60; box-shadow: 0 4px 16px rgba(0,0,0,.2); max-width: 90vw; }
+.modal { position: fixed; inset: 0; background: rgba(29,29,27,.45); display: grid; place-items: center; z-index: 50; padding: 16px; }
+.modal .card { max-width: 560px; width: 100%; }
+pre.code { background: #1d1d1b; color: #e9e7e1; padding: 12px; border-radius: 8px; max-height: 260px; overflow: auto; font: 11.5px/1.45 var(--mono); white-space: pre; }
+ol.steps { padding-left: 20px; } ol.steps li { margin: 0 0 8px; }
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.side { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 2px; }
+  nav.side button { width: auto; }
+  nav.side .sub, nav.side hr { display: none; }
+  main { padding: 16px; }
+  .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<script type="text/plain" id="gs-template">/**
+ * Method information study: backend.
+ * A Google Apps Script bound to a Google Sheet. It keeps the study content (a draft and every
+ * published version), assigns each participant a condition, saves their answers as they go,
+ * and emails you when someone finishes.
+ *
+ * Generated by the study editor on __GENERATED__.
+ * Setup: in your Sheet choose Extensions > Apps Script, replace the sample code with this file
+ * and SAVE it; then Deploy > New deployment > type: Web app, Execute as: Me,
+ * Who has access: Anyone. Copy the web app URL with its Copy button and paste it into the editor.
+ * Check: opening that URL in a private window should show {"ok":true,"app":"IS study",...}.
+ * After changing this script: Deploy > Manage deployments > pencil > Version: New version.
+ */
+var ADMIN_KEY = '__ADMIN_KEY__';        // private: lets the editor read and change the study
+var NOTIFY_EMAIL = '__NOTIFY_EMAIL__';  // where completion emails go ('' for none)
+var CHUNK = 40000;                      // characters per cell when storing JSON (a cell holds 50,000)
+var ACTIVE_MINUTES = 120;               // an unfinished participant counts toward balancing for this long
+
+var HEADERS = {
+  Content: ['version', 'status', 'saved', 'note', 'json_parts', 'json'],
+  Participants: ['pid', 'token', 'group', 'condition', 'pilot', 'version', 'status', 'step', 'started', 'updated', 'submitted', 'minutes', 'seq', 'json_parts', 'json']
+};
+// Participants columns
+var P_PID = 0, P_TOKEN = 1, P_GROUP = 2, P_COND = 3, P_PILOT = 4, P_VER = 5, P_STATUS = 6, P_STEP = 7,
+  P_STARTED = 8, P_UPDATED = 9, P_SUBMITTED = 10, P_MIN = 11, P_SEQ = 12, P_JSON = 13;
+
+function setup() {
+  Object.keys(HEADERS).forEach(function (n) { sheet_(n); });
+  Logger.log('Ready. Sheet: ' + SpreadsheetApp.getActiveSpreadsheet().getUrl() + ' | emails left today: ' + MailApp.getRemainingDailyQuota());
+}
+
+function doGet(e) {
+  var p = (e && e.parameter) || {};
+  if (p.action === 'content') return json_(safe_(function () { return content_(p); }));
+  return json_({ ok: true, app: 'IS study', version: 2, sheet: !!SpreadsheetApp.getActiveSpreadsheet() });
+}
+
+function doPost(e) {
+  var req;
+  try { req = JSON.parse(e.postData.contents); } catch (err) { return json_({ ok: false, error: 'Bad request' }); }
+  return json_(safe_(function () { return route_(req); }));
+}
+
+function safe_(fn) {
+  try { var r = fn() || {}; r.ok = true; return r; }
+  catch (err) {
+    var m = String((err && err.message) || err), out = { ok: false, error: m };
+    if (m.indexOf('BUSY: ') === 0) { out.busy = true; out.error = m.slice(6); }       // worth retrying
+    if (m.indexOf('CONFLICT: ') === 0) { out.conflict = true; out.error = m.slice(10); }
+    return out;
+  }
+}
+function json_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+var ADMIN = { ping: 1, getDraft: 1, saveDraft: 1, publish: 1, versions: 1, getVersion: 1, setStatus: 1,
+  participants: 1, responses: 1, deleteParticipant: 1, testEmail: 1 };
+
+function route_(r) {
+  if (ADMIN[r.action] && (!ADMIN_KEY || ADMIN_KEY.indexOf('__') === 0 || r.key !== ADMIN_KEY)) throw new Error('The admin key does not match this backend.');
+  var out;
+  switch (r.action) {
+    case 'ping':
+      var ss = SpreadsheetApp.getActiveSpreadsheet();
+      Object.keys(HEADERS).forEach(function (n) { sheet_(n); });
+      return { sheet: ss.getName(), url: ss.getUrl(), email: NOTIFY_EMAIL, quota: MailApp.getRemainingDailyQuota(), status: status_(), published: latestVersion_() };
+    case 'getDraft': return getDraft_();
+    case 'saveDraft': return locked_(function () { return saveDraft_(r.content, r.base, r.force); });
+    case 'publish': return locked_(function () { return publish_(r.content, r.note); });
+    case 'versions': return { versions: versions_() };
+    case 'getVersion': var c = getVersion_(Number(r.v)); if (!c) throw new Error('No such version.'); return { content: c };
+    case 'setStatus':
+      if (r.status !== 'open' && r.status !== 'closed') throw new Error('Status must be open or closed.');
+      PropertiesService.getScriptProperties().setProperty('STATUS', r.status);
+      return { status: r.status };
+    case 'participants': return { participants: participants_(false) };
+    case 'responses': return { participants: participants_(true) };
+    case 'deleteParticipant': return locked_(function () { deleteParticipant_(String(r.pid || '')); return {}; });
+    case 'testEmail':
+      if (!NOTIFY_EMAIL) throw new Error('No email address is set in the script.');
+      MailApp.sendEmail(NOTIFY_EMAIL, 'IS study: test email', 'Your study backend can send email. Completion emails will arrive like this.', { name: 'IS study' });
+      return {};
+    case 'content': return content_(r);
+    case 'join': return locked_(function () { return join_(r); });
+    case 'hello': return hello_(r);
+    case 'save': return locked_(function () { return save_(r); });
+    case 'submit':
+      out = locked_(function () { return submit_(r); });
+      if (out.mail) notify_(out.mail);
+      delete out.mail;
+      return out;
+    case 'withdraw': return locked_(function () { withdraw_(r); return {}; });
+  }
+  throw new Error('Unknown action: ' + r.action);
+}
+
+/* ---------- helpers ---------- */
+function locked_(fn) {
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) throw new Error('BUSY: The study server is busy. Please try again in a moment.');
+  try { return fn(); }
+  finally { SpreadsheetApp.flush(); lock.releaseLock(); }   // Sheets batches writes: flush before the next request reads
+}
+function sheet_(name) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) throw new Error('This script is not attached to a Google Sheet. Open your Sheet, choose Extensions > Apps Script, and paste the script there.');
+  var sh = ss.getSheetByName(name);
+  if (!sh) {
+    sh = ss.insertSheet(name);
+    var h = HEADERS[name];
+    if (h) { ensure_(sh, 1, h.length); sh.getRange(1, 1, 1, h.length).setValues([h]).setFontWeight('bold'); sh.setFrozenRows(1); }
+  }
+  return sh;
+}
+function ensure_(sh, row, col) {   // a new tab is 1,000 rows by 26 columns; writing outside it fails
+  var mr = sh.getMaxRows(), mc = sh.getMaxColumns();
+  if (row > mr) sh.insertRowsAfter(mr, row - mr + 200);
+  if (col > mc) sh.insertColumnsAfter(mc, col - mc + 10);
+}
+function table_(name) {
+  var sh = sheet_(name), last = sh.getLastRow(), cols = sh.getLastColumn();
+  var data = last > 1 && cols > 0 ? sh.getRange(2, 1, last - 1, cols).getValues() : [];
+  return { sh: sh, data: data };
+}
+function head_(name, width) {   // the first `width` columns of every data row, without the JSON parts
+  var sh = sheet_(name), last = sh.getLastRow();
+  ensure_(sh, 1, width);
+  return { sh: sh, data: last > 1 ? sh.getRange(2, 1, last - 1, width).getValues() : [] };
+}
+function rowAt_(sh, i) { return sh.getRange(i + 2, 1, 1, Math.max(1, sh.getLastColumn())).getValues()[0]; }
+function find_(data, test) { for (var i = 0; i < data.length; i++) if (test(data[i])) return i; return -1; }
+function pack_(obj) {
+  var s = JSON.stringify(obj), parts = [];
+  for (var i = 0; i < s.length; i += CHUNK) parts.push('~' + s.substr(i, CHUNK));
+  return parts;
+}
+function unpack_(row, at) {
+  var n = Number(row[at]) || 0, s = '';
+  for (var i = 1; i <= n; i++) s += String(row[at + i] || '').substr(1);
+  if (!s) return null;
+  try { return JSON.parse(s); } catch (err) { return null; }
+}
+function writeRow_(sh, rowIndex, fixed, parts) {
+  var vals = fixed.concat([parts.length]).concat(parts);
+  var width = Math.max(sh.getLastColumn(), vals.length);
+  while (vals.length < width) vals.push('');
+  ensure_(sh, rowIndex, vals.length);
+  sh.getRange(rowIndex, 1, 1, vals.length).setValues([vals]);
+}
+function iso_(v) { return v instanceof Date ? v.toISOString() : (v || ''); }
+function cell_(v) {   // for the readable Data sheet and short fields: text stays text
+  if (v === null || v === undefined) return '';
+  if (typeof v === 'number' || typeof v === 'boolean') return v;
+  if (Object.prototype.toString.call(v) === '[object Array]') v = v.join('; ');
+  var s = String(v);
+  if (s.length > 45000) s = s.slice(0, 45000) + '...';
+  return s === '' ? '' : "'" + s;   // no formulas, and no "1-2" turning into a date
+}
+function status_() { return PropertiesService.getScriptProperties().getProperty('STATUS') || 'open'; }
+function prop_(k) { return PropertiesService.getScriptProperties().getProperty(k); }
+function setProp_(k, v) { PropertiesService.getScriptProperties().setProperty(k, v); }
+
+/* ---------- content ---------- */
+// Content columns: 0 version (0 = draft), 1 status, 2 saved, 3 note, 4 json_parts, 5+ json
+function latestVersion_() {
+  var t = head_('Content', 2), v = 0;
+  t.data.forEach(function (r) { if (r[1] === 'published' && Number(r[0]) > v) v = Number(r[0]); });
+  return v;
+}
+function getVersion_(v) {
+  var t = head_('Content', 2);
+  var i = find_(t.data, function (r) { return Number(r[0]) === v && (v === 0 || r[1] === 'published'); });
+  return i < 0 ? null : unpack_(rowAt_(t.sh, i), 4);
+}
+function check_(c) {
+  if (!c || typeof c !== 'object' || !c.methods || !c.pairs || !c.groups) throw new Error('This is not study content.');
+  var s = JSON.stringify(c);
+  if (s.length > 2000000) throw new Error('The study content is too large (over 2 MB).');
+}
+function getDraft_() {
+  var t = head_('Content', 3);
+  var i = find_(t.data, function (r) { return Number(r[0]) === 0; });
+  var latest = latestVersion_();
+  if (i >= 0) return { draft: unpack_(rowAt_(t.sh, i), 4), saved: iso_(t.data[i][2]), published: latest };
+  return { draft: latest ? getVersion_(latest) : null, saved: '', published: latest };
+}
+function saveDraft_(c, base, force) {
+  check_(c);
+  var t = head_('Content', 3), now = new Date();
+  var i = find_(t.data, function (r) { return Number(r[0]) === 0; });
+  var cur = i >= 0 ? iso_(t.data[i][2]) : '';
+  if (!force && base !== undefined && base !== null && cur && cur !== base) throw new Error('CONFLICT: The draft in the Sheet was saved from another tab or browser at ' + cur + '.');
+  writeRow_(t.sh, i >= 0 ? i + 2 : t.sh.getLastRow() + 1, [0, 'draft', now, ''], pack_(c));
+  return { saved: now.toISOString() };
+}
+function publish_(c, note) {
+  if (!c) { var d = getDraft_(); c = d.draft; }
+  check_(c);
+  var v = latestVersion_() + 1, now = new Date();
+  c.version = v; c.publishedAt = now.toISOString();
+  var sh = sheet_('Content');
+  writeRow_(sh, sh.getLastRow() + 1, [v, 'published', now, cell_(note || '')], pack_(c));
+  // a small summary for joining, so a busy moment does not have to read the whole content
+  setProp_('META', JSON.stringify({ version: v, groups: (c.groups || []).map(function (g) { return { id: g.id, max: Number(g.max) || 0 }; }), pairs: c.pairs || [] }));
+  var r = saveDraft_(c, null, true);
+  return { version: v, saved: r.saved };
+}
+function meta_(latest) {
+  var m = null;
+  try { m = JSON.parse(prop_('META') || 'null'); } catch (err) { m = null; }
+  if (m && m.version === latest) return m;
+  var c = getVersion_(latest) || {};
+  return { version: latest, groups: (c.groups || []).map(function (g) { return { id: g.id, max: Number(g.max) || 0 }; }), pairs: c.pairs || [] };
+}
+function versions_() {
+  return head_('Content', 4).data.filter(function (r) { return r[1] === 'published'; })
+    .map(function (r) { return { version: Number(r[0]), saved: iso_(r[2]), note: r[3] }; })
+    .sort(function (a, b) { return b.version - a.version; });
+}
+/* What participants receive: no answer keys, unused questions, rubric or criteria. */
+function publicView_(c) {
+  var p = JSON.parse(JSON.stringify(c));
+  delete p.criteria;
+  (p.methods || []).forEach(function (m) {
+    delete m.rubric; delete m.note;
+    m.questions = (m.questions || []).filter(function (q) { return q.on; }).map(function (q) { return { id: q.id, stem: q.stem, options: q.options }; });
+  });
+  return p;
+}
+function content_(r) {
+  var latest = latestVersion_();
+  if (!latest) return { status: 'empty' };
+  var v = Number(r.v) || latest;
+  var c = getVersion_(v);
+  if (!c) throw new Error('This version of the study does not exist.');
+  return { status: status_(), version: v, latest: latest, content: publicView_(c) };
+}
+function conditions_(m) {
+  var out = [];
+  (m.pairs || []).forEach(function (p) { out.push(p.id + '1', p.id + '2'); });
+  return out;
+}
+function blocksFor_(m, cond) {
+  var pr = (m.pairs || []).filter(function (p) { return p.id === cond.slice(0, -1); })[0];
+  if (!pr) return [];
+  var first = cond.slice(-1) === '1';
+  return [{ method: pr.methods[0], format: first ? 'is' : 'core' }, { method: pr.methods[1], format: first ? 'core' : 'is' }];
+}
+
+/* ---------- participants ---------- */
+function who_(r) {
+  var t = head_('Participants', P_JSON);
+  var i = find_(t.data, function (x) { return String(x[P_PID]) === String(r.pid) && !!r.token && String(x[P_TOKEN]) === String(r.token); });
+  if (i < 0) throw new Error('This session is not recognised. Reload the study link to start again.');
+  return { t: t, i: i, row: t.data[i] };
+}
+function counts_(data, group, pilot, conds) {
+  var now = new Date().getTime(), counts = {};
+  conds.forEach(function (c) { counts[c] = 0; });
+  data.forEach(function (x) {
+    if (x[P_GROUP] !== group || String(x[P_PILOT] || '') !== pilot || !counts.hasOwnProperty(x[P_COND])) return;
+    var st = x[P_STATUS], upd = x[P_UPDATED] instanceof Date ? x[P_UPDATED].getTime() : 0;
+    if (st === 'completed' || ((st === 'started' || st === 'in progress') && now - upd < ACTIVE_MINUTES * 60000)) counts[x[P_COND]]++;
+  });
+  return counts;
+}
+function nextPid_(prefix, width, data) {   // numbers only go up, so a deleted participant's ID is never reused
+  var key = 'N_' + prefix, n = Number(prop_(key) || 0);
+  data.forEach(function (x) {
+    var id = String(x[P_PID]);
+    if (id.indexOf(prefix) === 0 && /^\d+$/.test(id.slice(prefix.length))) n = Math.max(n, Number(id.slice(prefix.length)));
+  });
+  n++; setProp_(key, String(n));
+  var s = String(n); while (s.length < width) s = '0' + s;
+  return prefix + s;
+}
+function join_(r) {
+  var latest = latestVersion_();
+  if (!latest) return { closed: true };
+  var token = String(r.token || '');
+  if (!/^[a-z0-9]{8,40}$/i.test(token)) throw new Error('Bad request');
+  var t = head_('Participants', P_JSON);
+  var again = find_(t.data, function (x) { return String(x[P_TOKEN]) === token; });
+  if (again >= 0) {   // the same browser asking twice (a retried request): the same participant
+    var x = t.data[again], mv = meta_(Number(x[P_VER]));
+    return { pid: String(x[P_PID]), condition: x[P_COND], version: Number(x[P_VER]), blocks: blocksFor_(mv, x[P_COND]), again: true };
+  }
+  if (status_() !== 'open') return { closed: true };
+  var m = meta_(latest);
+  var group = String(r.group || '').toLowerCase();
+  var g = (m.groups || []).filter(function (x) { return x.id === group; })[0];
+  if (!g) throw new Error('This study link is not complete. Check that you copied the whole link.');
+  var pilot = String(r.pilot || '');
+  if (pilot !== '' && pilot !== '1' && pilot !== 'nopage') throw new Error('Bad request');
+  var conds = conditions_(m);
+  if (!conds.length) throw new Error('The study has no conditions yet.');
+  if (!pilot && Number(g.max) > 0) {
+    var done = t.data.filter(function (x) { return x[P_GROUP] === group && !String(x[P_PILOT] || '') && x[P_STATUS] === 'completed'; }).length;
+    if (done >= Number(g.max)) return { full: true };
+  }
+  var counts = counts_(t.data, group, pilot, conds), best = conds[0];
+  conds.forEach(function (k) { if (counts[k] < counts[best]) best = k; });
+  var pid = nextPid_(group.toUpperCase() + (pilot ? 'P' : ''), pilot ? 2 : 3, t.data);
+  var now = new Date();
+  t.sh.appendRow([pid, token, group, best, pilot, latest, 'started', 'consent', now, now, '', '', 0, 0]);
+  return { pid: pid, condition: best, version: latest, blocks: blocksFor_(m, best) };
+}
+function hello_(r) {
+  var w = who_(r), row = w.row;
+  var res = { status: row[P_STATUS], step: row[P_STEP], condition: row[P_COND], version: Number(row[P_VER]), group: row[P_GROUP], pilot: String(row[P_PILOT] || '') };
+  if (row[P_STATUS] === 'started' || row[P_STATUS] === 'in progress') res.state = unpack_(rowAt_(w.t.sh, w.i), P_JSON);
+  return res;
+}
+function save_(r) {
+  var w = who_(r), st = w.row[P_STATUS];
+  if (st === 'completed' || st === 'withdrawn') return { ignored: true, status: st };
+  var seq = Number(r.seq) || 0;
+  if (seq && seq < (Number(w.row[P_SEQ]) || 0)) return { stale: true };   // an older copy, e.g. a second tab
+  var s = JSON.stringify(r.state || {});
+  if (s.length > 400000) throw new Error('Your answers are too long to save. Please shorten them.');
+  var fixed = w.row.slice(0, P_JSON);
+  fixed[P_STATUS] = 'in progress'; fixed[P_STEP] = cell_(r.step || ''); fixed[P_UPDATED] = new Date(); fixed[P_SEQ] = Math.max(seq, Number(w.row[P_SEQ]) || 0);
+  writeRow_(w.t.sh, w.i + 2, fixed, pack_(r.state || {}));
+  return { saved: fixed[P_UPDATED].toISOString() };
+}
+function submit_(r) {
+  var w = who_(r);
+  if (w.row[P_STATUS] === 'completed') return { duplicate: true };
+  if (w.row[P_STATUS] === 'withdrawn') throw new Error('This session was withdrawn.');
+  var seq = Number(r.seq) || 0;
+  if (seq && seq < (Number(w.row[P_SEQ]) || 0)) return { stale: true };
+  var state = r.state || {}, now = new Date();
+  var started = w.row[P_STARTED] instanceof Date ? w.row[P_STARTED] : now;
+  var minutes = Math.round((now.getTime() - started.getTime()) / 6000) / 10;
+  var fixed = w.row.slice(0, P_JSON);
+  fixed[P_STATUS] = 'completed'; fixed[P_STEP] = 'end'; fixed[P_UPDATED] = now; fixed[P_SUBMITTED] = now; fixed[P_MIN] = minutes; fixed[P_SEQ] = Math.max(seq, Number(w.row[P_SEQ]) || 0);
+  writeRow_(w.t.sh, w.i + 2, fixed, pack_(state));
+  // the answers are safe from here on; the readable copy and the email must never undo that
+  var mail = null;
+  try {
+    var c = getVersion_(Number(w.row[P_VER])) || {};
+    var flat = flatten_(c, fixed, state);
+    try { wide_(flat); } catch (err) { Logger.log('Data sheet not updated: ' + err); }
+    mail = mail_(c, fixed, flat);
+  } catch (err) { Logger.log('Summary failed: ' + err); }
+  return { received: now.toISOString(), mail: mail };
+}
+function withdraw_(r) {
+  var w = who_(r);
+  var fixed = w.row.slice(0, P_JSON);
+  fixed[P_STATUS] = 'withdrawn'; fixed[P_STEP] = ''; fixed[P_UPDATED] = new Date(); fixed[P_MIN] = '';
+  writeRow_(w.t.sh, w.i + 2, fixed, []);
+  removeWide_(String(w.row[P_PID]));
+}
+function participants_(withState) {
+  return (withState ? table_('Participants') : head_('Participants', P_JSON)).data.map(function (r) {
+    var o = { pid: String(r[P_PID]), group: r[P_GROUP], condition: r[P_COND], pilot: String(r[P_PILOT] || ''), version: Number(r[P_VER]) || 0,
+      status: r[P_STATUS], step: r[P_STEP], started: iso_(r[P_STARTED]), updated: iso_(r[P_UPDATED]), submitted: iso_(r[P_SUBMITTED]), minutes: r[P_MIN] };
+    if (withState) o.state = unpack_(r, P_JSON);
+    return o;
+  });
+}
+function deleteParticipant_(pid) {
+  var t = head_('Participants', 1);
+  for (var i = t.data.length - 1; i >= 0; i--) if (String(t.data[i][P_PID]) === pid) t.sh.deleteRow(i + 2);
+  removeWide_(pid);
+}
+
+/* ---------- the readable Data sheet: one row per finished participant ---------- */
+function flatten_(c, row, s) {
+  var f = { pid: row[P_PID], group: row[P_GROUP], condition: row[P_COND], pilot: row[P_PILOT], version: row[P_VER],
+    started: iso_(row[P_STARTED]), submitted: iso_(row[P_SUBMITTED]), minutes: row[P_MIN] };
+  var about = s.about || {};
+  Object.keys(about).forEach(function (k) { f['about_' + k] = about[k]; });
+  var methods = {};
+  (c.methods || []).forEach(function (m) { methods[m.id] = m; });
+  (s.blocks || []).forEach(function (b, i) {
+    var k = 'b' + (i + 1) + '_', m = methods[b.method] || { questions: [] }, right = 0, n = 0;
+    f[k + 'method'] = b.method; f[k + 'format'] = b.format;
+    (m.questions || []).filter(function (q) { return q.on; }).forEach(function (q) {
+      var a = (b.answers || {})[q.id] || '';
+      n++; if (a && a === q.key) right++;
+      f[k + q.id] = a; f[k + q.id + '_ok'] = a === q.key ? 1 : 0;
+    });
+    f[k + 'correct'] = right; f[k + 'questions'] = n;
+    ['ease', 'work', 'conf', 'useful', 'plan', 'mistake', 'teachuse'].forEach(function (x) { if (b[x] !== undefined && b[x] !== null) f[k + x] = b[x]; });
+    var t = b.t || {};
+    if (t.start && t.a) f[k + 'read_s'] = Math.round((t.a - t.start) / 1000);
+    if (t.a && t.b) f[k + 'work_s'] = Math.round((t.b - t.a) / 1000);
+    if (t.b && t.c) f[k + 'teach_s'] = Math.round((t.c - t.b) / 1000);
+    if (b.hidden_ms) f[k + 'hidden_s'] = Math.round(b.hidden_ms / 1000);
+  });
+  var views = s.views || {};
+  Object.keys(views).forEach(function (k) { f['views_' + k] = views[k]; });
+  return f;
+}
+function wide_(flat) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName('Data') || ss.insertSheet('Data');
+  var cols = sh.getLastColumn();
+  var head = cols ? sh.getRange(1, 1, 1, cols).getValues()[0].map(String) : [];
+  var idx = {};
+  head.forEach(function (h, i) { idx[h] = i; });
+  Object.keys(flat).forEach(function (k) { if (!idx.hasOwnProperty(k)) { idx[k] = head.length; head.push(k); } });
+  if (head.length > cols) { ensure_(sh, 1, head.length); sh.getRange(1, 1, 1, head.length).setValues([head]).setFontWeight('bold'); sh.setFrozenRows(1); }
+  var row = head.map(function (h) { return flat.hasOwnProperty(h) ? cell_(flat[h]) : ''; });
+  var last = sh.getLastRow(), at = -1;
+  if (last > 1) {
+    var ids = sh.getRange(2, 1, last - 1, 1).getValues();
+    for (var i = 0; i < ids.length; i++) if (String(ids[i][0]) === String(flat.pid)) { at = i + 2; break; }
+  }
+  var target = at > 0 ? at : last + 1;
+  ensure_(sh, target, row.length);
+  sh.getRange(target, 1, 1, row.length).setValues([row]);
+}
+function removeWide_(pid) {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Data');
+  if (!sh || sh.getLastRow() < 2) return;
+  var ids = sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues();
+  for (var i = ids.length - 1; i >= 0; i--) if (String(ids[i][0]) === pid) sh.deleteRow(i + 2);
+}
+
+/* ---------- email ---------- */
+function mail_(c, row, flat) {
+  var names = {};
+  (c.methods || []).forEach(function (m) { names[m.id] = m.name; });
+  var parts = [1, 2].map(function (k) {
+    var b = 'b' + k + '_';
+    if (!flat[b + 'method']) return '';
+    return (names[flat[b + 'method']] || flat[b + 'method']) + ' (' + (flat[b + 'format'] === 'is' ? 'IS page' : flat[b + 'format'] === 'core' ? 'core page' : 'no page') + '): '
+      + flat[b + 'correct'] + ' of ' + flat[b + 'questions'] + ' questions correct';
+  }).filter(String);
+  return {
+    subject: 'IS study: ' + row[P_PID] + ' finished' + (row[P_PILOT] ? ' (pilot)' : ''),
+    body: row[P_PID] + ' (' + String(row[P_GROUP]).toUpperCase() + ', condition ' + row[P_COND] + ', content version ' + row[P_VER] + ') finished in '
+      + row[P_MIN] + ' minutes.\n\n' + parts.join('\n') + '\n\nAll answers: ' + SpreadsheetApp.getActiveSpreadsheet().getUrl()
+  };
+}
+function notify_(m) {
+  if (!NOTIFY_EMAIL || !m) return;
+  try { MailApp.sendEmail(NOTIFY_EMAIL, m.subject, m.body, { name: 'IS study' }); } catch (err) { }
+}
+</script>
+<header class="top">
+  <h1>Study editor</h1>
+  <span class="pill" id="conn">Not connected</span>
+  <span class="pill" id="save">No study loaded</span>
+  <span class="sp"></span>
+  <button class="ghost" id="pv-btn" type="button">Preview</button>
+  <button id="pub-btn" type="button">Publish</button>
+</header>
+<div class="layout">
+  <nav class="side" id="nav" aria-label="Sections"></nav>
+  <main id="main"></main>
+</div>
+<script>
+(function () {
+  'use strict';
+  /* =============================== basics =============================== */
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function h(tag, attrs, ...kids) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k in attrs) {
+      const v = attrs[k];
+      if (v == null || v === false) continue;
+      if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+      else if (k === 'html') e.innerHTML = v;
+      else if (k === 'value') e.value = v;
+      else e.setAttribute(k, v === true ? '' : v);
+    }
+    kids.flat().forEach(k => { if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(String(k))); });
+    return e;
+  }
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const clone = o => JSON.parse(JSON.stringify(o));
+  const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+  const ls = {
+    get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+    del(k) { try { localStorage.removeItem(k); } catch (e) { } },
+  };
+  function toast(t, ms = 3200) { const e = h('div', { class: 'toast', role: 'status' }, t); document.body.append(e); setTimeout(() => e.remove(), ms); }
+  function download(name, data, type) {
+    const a = h('a', { href: URL.createObjectURL(data instanceof Blob ? data : new Blob([data], { type: type || 'application/octet-stream' })), download: name });
+    document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  const stamp = () => new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
+  function randomKey(n = 24) { const a = new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a, x => 'abcdefghijkmnpqrstuvwxyz23456789'[x % 32]).join(''); }
+  const b64u = { enc(str) { const u = new TextEncoder().encode(str); let s = ''; u.forEach(x => { s += String.fromCharCode(x); }); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); } };
+  function confirmBox(title, text, yesLabel, danger) {
+    return new Promise(res => {
+      const box = h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true' });
+      const close = v => { box.remove(); res(v); };
+      box.append(h('div', { class: 'card' }, h('h4', null, title), h('p', { class: 'note', html: text }),
+        h('div', { class: 'row' }, h('button', { class: 'btn primary' + (danger ? ' danger' : ''), type: 'button', onclick: () => close(true) }, yesLabel || 'Yes'),
+          h('button', { class: 'btn quiet', type: 'button', onclick: () => close(false) }, 'Cancel'))));
+      document.body.append(box); box.querySelector('button').focus();
+    });
+  }
+
+  /* =============================== HTML hygiene (same allow-list as the participant page) =============================== */
+  const KEEP = { P: 1, UL: 1, OL: 1, LI: 1, B: 1, STRONG: 1, I: 1, EM: 1, BR: 1, A: 1, H3: 1, H4: 1, TABLE: 1, THEAD: 1, TBODY: 1, TR: 1, TH: 1, TD: 1, IMG: 1, SUP: 1, SUB: 1, U: 1 };
+  const RICH = { DIV: 1, SPAN: 1, svg: 1, circle: 1, line: 1, path: 1, rect: 1, g: 1 };
+  const ATTR = { href: 1, src: 1, alt: 1, type: 1, start: 1, colspan: 1, rowspan: 1, class: 1, width: 1, height: 1, viewBox: 1, cx: 1, cy: 1, r: 1, x: 1, y: 1, x1: 1, y1: 1, x2: 1, y2: 1, d: 1, fill: 1, stroke: 1, 'stroke-width': 1, 'aria-label': 1, role: 1, rx: 1 };
+  function clean(html, rich) {
+    const doc = new DOMParser().parseFromString('<div>' + (html || '') + '</div>', 'text/html');
+    (function walk(node) {
+      Array.from(node.childNodes).forEach(ch => {
+        if (ch.nodeType === 3) return;
+        if (ch.nodeType !== 1) { ch.remove(); return; }
+        const tag = ch.tagName, up = tag.toUpperCase();
+        if (/^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|FORM|INPUT|BUTTON|LINK|META|NOSCRIPT)$/.test(up)) { ch.remove(); return; }
+        // headings from pasted or imported text become small headings, as on ReMeDe's own page
+        if (/^H[1256]$/.test(up)) { const n = doc.createElement('h3'); while (ch.firstChild) n.append(ch.firstChild); ch.replaceWith(n); walk(n); return; }
+        const ok = KEEP[up] || (rich && (RICH[up] || RICH[tag]));
+        if (!ok) { walk(ch); while (ch.firstChild) ch.parentNode.insertBefore(ch.firstChild, ch); ch.remove(); return; }
+        Array.from(ch.attributes).forEach(a => {
+          const n = a.name;
+          if (!ATTR[n] || (n === 'class' && !rich)) { ch.removeAttribute(n); return; }
+          if ((n === 'href' || n === 'src') && !/^(https?:|mailto:)/i.test(a.value.trim())) { ch.removeAttribute(n); return; }
+          if (n === 'href') { try { const u = new URL(a.value); [...u.searchParams.keys()].filter(k => /^utm_/i.test(k)).forEach(k => u.searchParams.delete(k)); ch.setAttribute('href', u.toString()); } catch (e) { } }
+        });
+        if (up === 'A') { ch.setAttribute('target', '_blank'); ch.setAttribute('rel', 'noopener'); }
+        walk(ch);
+        if ((up === 'P' || up === 'LI') && !ch.textContent.trim() && !ch.querySelector('img')) ch.remove();
+      });
+    })(doc.body.firstChild);
+    return doc.body.firstChild.innerHTML.replace(/\s+\n/g, '\n').trim();
+  }
+  const plain = html => { const d = document.createElement('div'); d.innerHTML = html || ''; return d.textContent.replace(/\s+/g, ' ').trim(); };
+
+  /* =============================== ReMeDe pages -> elements =============================== */
+  const SYN = {
+    'objective': 'Objective', 'objectives': 'Objective', 'purpose': 'Objective',
+    'detailed description': 'Detailed description', 'description': 'Detailed description',
+    'steps': 'Steps', 'procedure': 'Steps', 'input': 'Input', 'inputs': 'Input', 'output': 'Output', 'outputs': 'Output',
+    'concise example': 'Concise example', 'detailed example': 'Detailed example',
+    'benefits': 'Benefits', 'benefit': 'Benefits', 'limitations': 'Limitations', 'limitation': 'Limitations',
+    'things to keep in mind': 'Things to keep in mind', 'required resources': 'Required resources', 'resources': 'Required resources',
+    'design phase': 'Design phase', 'design phases': 'Design phase', 'suitable domain': 'Suitable domain', 'suitable domains': 'Suitable domain',
+    'related method': 'Related methods', 'related methods': 'Related methods',
+    'level of difficulty': 'Level of difficulty', 'difficulty level': 'Level of difficulty',
+    'method specific skill(s)': 'Method-specific skills', 'method specific skills': 'Method-specific skills', 'method-specific skills': 'Method-specific skills',
+    'method specific skill': 'Method-specific skills', 'method-specific skill(s)': 'Method-specific skills',
+    'underlying assumptions': 'Underlying assumptions', 'underlying assumption': 'Underlying assumptions',
+    'literature': 'Literature', 'references': 'Literature',
+  };
+  const norm = t => String(t || '').replace(/ /g, ' ').replace(/[:\s]+$/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  function parseRemede(html, names) {
+    const syn = Object.assign({}, SYN); names.forEach(n => { syn[norm(n)] = n; });
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const sections = {}, order = [], extra = [];
+    let cur = null;
+    const start = name => { cur = name; if (!sections[name]) { sections[name] = doc.createElement('div'); order.push(name); } };
+    Array.from(doc.body.children).forEach(node => {
+      const tag = node.tagName.toUpperCase(), text = node.textContent || '';
+      if (/^H[1-6]$/.test(tag)) {
+        const key = syn[norm(text)];
+        if (key) { start(key); return; }
+        if (!norm(text)) return;
+        if (!cur) { extra.push(text.trim()); start('__before'); }
+        const hh = doc.createElement('h3'); hh.textContent = text.replace(/:\s*$/, '').trim(); sections[cur].append(hh); return;
+      }
+      const first = Array.from(node.childNodes).find(c => !(c.nodeType === 3 && !c.nodeValue.trim()));
+      const lead = first && first.nodeType === 1 ? first : null;
+      if (tag === 'P' && lead && /^(B|STRONG)$/.test(lead.tagName)) {
+        const key = syn[norm(lead.textContent)];
+        if (key) { start(key); lead.remove(); if (node.textContent.trim()) sections[cur].append(node.cloneNode(true)); return; }
+      }
+      if (!cur) start('__before');
+      sections[cur].append(node.cloneNode(true));
+    });
+    const elements = {}, missing = [];
+    names.forEach(name => {
+      const box = sections[name];
+      const out = box ? clean(box.innerHTML) : '';
+      if (!out || !plain(out) && !/<img/i.test(out)) { missing.push(name); return; }
+      elements[name] = out;
+    });
+    order.filter(n => !names.includes(n) && n !== '__before').forEach(n => extra.push(n));
+    return { elements, missing, extra };
+  }
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  /* =============================== backend =============================== */
+  const E = { backend: ls.get('ise-backend') || '', key: ls.get('ise-key') || '', conn: null, draft: null, savedAt: '', dirty: false, saving: false,
+    section: 'connect', method: null, mtab: 'details', published: 0, publishedContent: null, status: 'open', parts: null, versions: [], offline: false };
+  async function api(action, payload = {}, retries = 1) {
+    if (!E.backend) throw new Error('Not connected to a backend.');
+    let last;
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const res = await fetch(E.backend, { method: 'POST', body: JSON.stringify(Object.assign({ action, key: E.key }, payload)), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' });
+        const text = await res.text(); let data;
+        try { data = JSON.parse(text); } catch (e) {
+          throw Object.assign(new Error(res.ok ? 'The backend answered with a web page instead of data. Check that the web app is deployed with “Who has access: Anyone”.' : 'The backend returned error ' + res.status + '.'), { fatal: true });
+        }
+        if (!data.ok) throw Object.assign(new Error(data.error || 'The request failed.'), { fatal: true });
+        return data;
+      } catch (e) { last = e; if (e.fatal) break; if (i < retries) await sleep(800); }
+    }
+    if (last && /Failed to fetch|NetworkError|Load failed/i.test(last.message)) last.message = 'Could not reach the backend. Check the web app URL and your connection.';
+    throw last;
+  }
+  function backendParam() {
+    const m = /^https:\/\/script\.google\.com\/macros\/s\/([\w-]+)\/exec\/?$/.exec(E.backend || '');
+    return m ? m[1] : '~' + b64u.enc(E.backend);
+  }
+  const siteBase = () => location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
+
+  /* =============================== the draft =============================== */
+  const D = () => E.draft;
+  function stripMeta(c) { const x = clone(c); delete x.version; delete x.publishedAt; delete x.editedAt; return JSON.stringify(x); }
+  function differsFromPublished() { return !!(E.draft && (!E.publishedContent || stripMeta(E.draft) !== stripMeta(E.publishedContent))); }
+  const saveRemote = debounce(() => pushDraft(), 2500);
+  function changed(opts = {}) {
+    E.dirty = true; E.draft.editedAt = new Date().toISOString();
+    ls.set('ise-draft', { at: E.draft.editedAt, backend: E.backend, content: E.draft });
+    if (E.backend && E.conn && !E.offline) saveRemote();
+    drawStatus();
+    if (opts.nav !== false) drawNavDebounced();
+  }
+  async function pushDraft(force) {
+    if (!E.draft || !E.conn || E.conflict) return false;
+    while (E.saving) await sleep(150);
+    E.saving = true; drawStatus();
+    let ok = false;
+    try { const r = await api('saveDraft', { content: E.draft, base: E.savedAt || null, force: !!force }); E.savedAt = r.saved; E.dirty = false; ok = true; }
+    catch (e) {
+      if (/saved from another tab or browser/i.test(e.message)) { E.saving = false; drawStatus(); return resolveConflict(e.message); }
+      toast('Not saved to the Sheet: ' + e.message, 6000);
+    }
+    E.saving = false; drawStatus();
+    return ok;
+  }
+  async function resolveConflict(msg) {
+    E.conflict = true;
+    const keep = await confirmBox('The draft changed somewhere else', esc(msg) + ' Keep the version in this tab (it replaces the other), or load the Sheet’s version (this tab’s unsaved changes are lost)?', 'Keep this tab’s version');
+    E.conflict = false;
+    if (keep) return pushDraft(true);
+    const d = await api('getDraft'); setDraft(d.draft); E.savedAt = d.saved; E.dirty = false; render(); toast('Loaded the draft from the Sheet.');
+    return false;
+  }
+  function drawStatus() {
+    const c = $('#conn'), s = $('#save');
+    c.className = 'pill' + (E.conn ? ' ok' : E.offline ? ' amber' : '');
+    c.textContent = E.conn ? 'Connected: ' + E.conn.sheet : E.offline ? 'Working in this browser only' : 'Not connected';
+    if (!E.draft) { s.className = 'pill'; s.textContent = 'No study loaded'; return; }
+    const t = E.savedAt ? new Date(E.savedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+    if (E.saving) { s.className = 'pill'; s.textContent = 'Saving…'; }
+    else if (E.conn && E.dirty) { s.className = 'pill amber'; s.textContent = 'Unsaved changes'; }
+    else if (E.conn) { s.className = 'pill ok'; s.textContent = 'Saved to the Sheet' + (t ? ' · ' + t : ''); }
+    else { s.className = 'pill amber'; s.textContent = 'Saved in this browser'; }
+    $('#pub-btn').textContent = differsFromPublished() ? 'Publish changes' : 'Published' + (E.published ? ' v' + E.published : '');
+  }
+
+  /* =============================== small form builders =============================== */
+  function field(label, obj, key, o = {}) {
+    const id = 'f' + Math.random().toString(36).slice(2, 9);
+    let inp;
+    if (o.type === 'textarea' || o.type === 'md') inp = h('textarea', { class: 'in' + (o.tall ? ' tall' : '') + (o.mono ? ' mono' : ''), id, rows: o.rows || 3 });
+    else if (o.type === 'select') inp = h('select', { class: 'in', id }, (o.options || []).map(x => Array.isArray(x) ? h('option', { value: x[0] }, x[1]) : h('option', { value: x }, x)));
+    else if (o.type === 'check') inp = h('input', { type: 'checkbox', id });
+    else inp = h('input', { class: 'in' + (o.mono ? ' mono' : ''), id, type: o.type === 'number' ? 'number' : 'text', step: o.type === 'number' ? 'any' : null, placeholder: o.ph || '' });
+    const v = obj[key];
+    if (o.type === 'check') inp.checked = !!v; else if (o.type === 'lines') inp.value = (v || []).join('\n'); else inp.value = v == null ? '' : v;
+    if (o.type === 'lines') { const ta = h('textarea', { class: 'in', id, rows: o.rows || 4 }); ta.value = (v || []).join('\n'); inp = ta; }
+    const read = () => {
+      if (o.type === 'check') return inp.checked;
+      if (o.type === 'number') return inp.value === '' ? (o.empty !== undefined ? o.empty : null) : Number(inp.value);
+      if (o.type === 'lines') return inp.value.split('\n').map(s => s.trim()).filter(Boolean);
+      return inp.value;
+    };
+    inp.addEventListener(o.type === 'check' || o.type === 'select' ? 'change' : 'input', () => { obj[key] = read(); changed({ nav: !!o.nav }); if (o.onchange) o.onchange(obj[key]); });
+    if (o.type === 'check') return h('div', { class: 'fld' }, h('label', { for: id, style: 'display:inline-flex;gap:6px;align-items:center;font-weight:600;color:var(--ink-2)' }, inp, label), o.hint ? h('div', { class: 'hint', html: o.hint }) : null);
+    return h('div', { class: 'fld' }, h('label', { for: id }, label), inp, o.hint ? h('div', { class: 'hint', html: o.hint }) : null);
+  }
+  function rich(obj, key, o = {}) {
+    const wrap = h('div', { class: 'rich' });
+    const area = h('div', { class: 'rarea', contenteditable: 'true', role: 'textbox', 'aria-multiline': 'true', 'aria-label': o.label || key });
+    const code = h('textarea', { class: 'rcode', spellcheck: 'false', 'aria-label': (o.label || key) + ' (HTML)' });
+    let mode = o.html ? 'html' : 'visual', range = null;
+    const show = () => { area.style.display = mode === 'visual' ? '' : 'none'; code.style.display = mode === 'html' ? '' : 'none'; htmlBtn.classList.toggle('on', mode === 'html'); };
+    const load = () => { area.innerHTML = obj[key] || ''; code.value = obj[key] || ''; };
+    const commit = () => {
+      const c = clean(mode === 'visual' ? area.innerHTML : code.value, o.rich);
+      if (c !== (obj[key] || '')) { obj[key] = c; if (o.onchange) o.onchange(c); changed({ nav: false }); }
+    };
+    const later = debounce(commit, 500);
+    area.addEventListener('input', later); area.addEventListener('blur', () => { commit(); });
+    code.addEventListener('input', later); code.addEventListener('blur', () => { commit(); });
+    area.addEventListener('paste', e => {
+      e.preventDefault();
+      const d = e.clipboardData, html = d.getData('text/html'), text = d.getData('text/plain');
+      const ins = html ? clean(html, o.rich) : esc(text).split(/\n{2,}/).map(p => '<p>' + p.replace(/\n/g, '<br>') + '</p>').join('');
+      document.execCommand('insertHTML', false, ins);
+    });
+    const keep = e => { e.preventDefault(); const s = getSelection(); if (s.rangeCount) range = s.getRangeAt(0); };
+    const cmd = (c, v) => { area.focus(); if (range) { const s = getSelection(); s.removeAllRanges(); s.addRange(range); } document.execCommand(c, false, v); commit(); };
+    const linkIn = h('input', { type: 'url', placeholder: 'https://… then Enter', style: 'display:none' });
+    linkIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const u = linkIn.value.trim(); linkIn.style.display = 'none'; if (/^https?:\/\//.test(u)) cmd('createLink', u); } if (e.key === 'Escape') linkIn.style.display = 'none'; });
+    const bt = (label, title, fn) => h('button', { type: 'button', title, 'aria-label': title, onmousedown: keep, onclick: fn }, label);
+    const htmlBtn = bt('HTML', 'Edit the HTML', () => { if (mode === 'visual') { commit(); code.value = obj[key] || ''; mode = 'html'; } else { commit(); area.innerHTML = obj[key] || ''; mode = 'visual'; } show(); });
+    const bar = h('div', { class: 'rbar' },
+      bt(h('b', null, 'B'), 'Bold', () => cmd('bold')), bt(h('i', null, 'I'), 'Italic', () => cmd('italic')),
+      bt('• List', 'Bulleted list', () => cmd('insertUnorderedList')), bt('1. List', 'Numbered list', () => cmd('insertOrderedList')),
+      bt('H', 'Small heading', () => cmd('formatBlock', 'h3')), bt('¶', 'Paragraph', () => cmd('formatBlock', 'p')),
+      bt('Link', 'Add a link', () => { linkIn.style.display = ''; linkIn.value = ''; linkIn.focus(); }), linkIn,
+      bt('Clear', 'Remove formatting', () => cmd('removeFormat')), h('span', { class: 'sp' }), htmlBtn);
+    wrap.append(bar, area, code); load(); show();
+    wrap._reload = () => { load(); };
+    return wrap;
+  }
+  const iconBtn = (t, title, fn, dis) => h('button', { class: 'iconbtn', type: 'button', title, 'aria-label': title, onclick: fn, disabled: dis || null }, t);
+  function move(list, i, d) { const j = i + d; if (j < 0 || j >= list.length) return false; [list[i], list[j]] = [list[j], list[i]]; return true; }
+
+  /* =============================== navigation =============================== */
+  const SECTIONS = [['connect', 'Connect'], ['overview', 'Overview'], ['texts', 'Texts'], ['about', 'About you'], ['methods', 'Methods'],
+    ['elements', 'Elements and core page'], ['pairs', 'Pairs and conditions'], ['views', 'Your views'], ['checks', 'Checks'], ['publish', 'Publish and versions'], ['data', 'Participants and data']];
+  function drawNav() {
+    const nav = $('#nav'); nav.innerHTML = '';
+    const res = E.draft ? runChecks() : [];
+    const nErr = res.filter(r => r.level === 'error').length, nWarn = res.filter(r => r.level === 'warn').length;
+    SECTIONS.forEach(([id, label]) => {
+      if (!E.draft && !['connect'].includes(id)) return;
+      const b = h('button', { type: 'button', class: E.section === id ? 'on' : '', onclick: () => { E.section = id; render(); } }, h('span', null, label),
+        id === 'checks' && (nErr || nWarn) ? h('span', { class: 'badge' + (nErr ? '' : ' amber') }, String(nErr || nWarn)) : null);
+      nav.append(b);
+      if (id === 'methods' && E.draft) D().methods.forEach(m => nav.append(h('button', { type: 'button', class: 'sub' + (E.section === 'methods' && E.method === m.id ? ' on' : ''), onclick: () => { E.section = 'methods'; E.method = m.id; render(); } }, h('span', null, m.name || m.id))));
+      if (id === 'overview') nav.append(h('hr'));
+    });
+  }
+  const drawNavDebounced = debounce(drawNav, 400);
+  function render() {
+    drawNav(); drawStatus();
+    const main = $('#main'); main.innerHTML = '';
+    const f = { connect: secConnect, overview: secOverview, texts: secTexts, about: () => secItems('about'), methods: secMethods, elements: secElements, pairs: secPairs,
+      views: () => secItems('views'), checks: secChecks, publish: secPublish, data: secData }[E.section] || secConnect;
+    if (!E.draft && E.section !== 'connect') E.section = 'connect';
+    (E.draft ? f : secConnect)(main);
+    window.scrollTo(0, 0);
+  }
+
+  /* =============================== Connect =============================== */
+  function secConnect(main) {
+    main.append(h('h2', null, 'Connect'),
+      h('p', { class: 'lead' }, 'The study keeps its content and every answer in a Google Sheet of yours, through a small script. Set it up once, then connect this editor to it.'));
+    const url = h('input', { class: 'in mono', value: E.backend, placeholder: 'https://script.google.com/macros/s/…/exec' });
+    const key = h('input', { class: 'in mono', value: E.key, placeholder: 'the admin key you put in the script' });
+    const msg = h('div');
+    const connectBtn = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
+      msg.innerHTML = ''; connectBtn.disabled = true;
+      E.backend = url.value.trim(); E.key = key.value.trim();
+      try { await connect(); msg.append(h('div', { class: 'msg ok' }, 'Connected to “' + E.conn.sheet + '”.')); ls.set('ise-backend', E.backend); ls.set('ise-key', E.key); render(); }
+      catch (e) { msg.append(h('div', { class: 'msg bad' }, e.message)); E.conn = null; drawStatus(); }
+      connectBtn.disabled = false;
+    } }, E.conn ? 'Reconnect' : 'Connect');
+    const card = h('div', { class: 'card' }, h('h4', null, 'Your backend'),
+      h('div', { class: 'fld' }, h('label', null, 'Web app URL (from Deploy in Apps Script)'), url),
+      h('div', { class: 'fld' }, h('label', null, 'Admin key'), key),
+      h('div', { class: 'row' }, connectBtn,
+        E.conn ? h('button', { class: 'btn quiet', type: 'button', onclick: async () => { try { await api('testEmail'); toast('Test email sent to ' + E.conn.email); } catch (e) { toast(e.message, 6000); } } }, 'Send a test email') : null,
+        E.conn ? h('a', { class: 'btn quiet', href: E.conn.url, target: '_blank', rel: 'noopener' }, 'Open the Sheet') : null,
+        E.conn ? h('button', { class: 'btn quiet', type: 'button', onclick: () => { ls.del('ise-backend'); ls.del('ise-key'); E.conn = null; E.backend = ''; E.key = ''; render(); } }, 'Forget in this browser') : null), msg);
+    main.append(card);
+    if (E.conn && !E.draft) main.append(firstRun());
+    if (!E.conn) {
+      main.append(setupCard());
+      main.append(h('div', { class: 'card' }, h('h4', null, 'Or work in this browser only'),
+        h('p', { class: 'note' }, 'You can edit and preview without a backend. Changes stay in this browser; connect later to save them to the Sheet and publish.'),
+        h('div', { class: 'row' }, fileButton('Open a study file…', async c => { setDraft(c); E.offline = true; E.section = 'overview'; changed(); render(); }),
+          ls.get('ise-draft') ? h('button', { class: 'btn quiet', type: 'button', onclick: () => { setDraft(ls.get('ise-draft').content); E.offline = true; E.section = 'overview'; render(); } }, 'Continue with the copy in this browser') : null)));
+    }
+  }
+  function firstRun() {
+    return h('div', { class: 'card' }, h('h4', null, 'Load the starting content'),
+      h('p', { class: 'note', html: 'This Sheet has no study yet. Load <code>IS_study_content.json</code> from the kit (keep that file off GitHub: it holds the answer keys).' }),
+      h('div', { class: 'row' }, fileButton('Load IS_study_content.json…', async c => { setDraft(c); E.section = 'overview'; await pushDraft(); render(); toast('Loaded and saved to the Sheet.'); }),
+        ls.get('ise-draft') ? h('button', { class: 'btn quiet', type: 'button', onclick: async () => { setDraft(ls.get('ise-draft').content); await pushDraft(); E.section = 'overview'; render(); } }, 'Use the copy in this browser') : null));
+  }
+  function fileButton(label, onload) {
+    const inp = h('input', { type: 'file', accept: '.json,application/json', style: 'display:none' });
+    inp.addEventListener('change', async () => {
+      const f = inp.files[0]; if (!f) return;
+      try { const c = JSON.parse(await f.text()); if (!c.methods || !c.pairs || !c.groups) throw new Error('This file is not study content.'); await onload(c); }
+      catch (e) { toast('Could not open the file: ' + e.message, 6000); }
+      inp.value = '';
+    });
+    return h('span', null, inp, h('button', { class: 'btn', type: 'button', onclick: () => inp.click() }, label));
+  }
+  function setupCard() {
+    const tpl = $('#gs-template').textContent;
+    const email = h('input', { class: 'in', value: (ls.get('ise-draft') && ls.get('ise-draft').content.researcher && ls.get('ise-draft').content.researcher.email) || '', placeholder: 'you@example.org' });
+    const keyIn = h('input', { class: 'in mono', value: E.key || randomKey() });
+    const script = () => tpl.replace("'__ADMIN_KEY__'", JSON.stringify(keyIn.value.trim())).replace("'__NOTIFY_EMAIL__'", JSON.stringify(email.value.trim())).replace('__GENERATED__', new Date().toISOString().slice(0, 10));
+    return h('div', { class: 'card' }, h('h4', null, 'Set up the backend (once)'),
+      h('ol', { class: 'steps' },
+        h('li', { html: 'Create a new Google Sheet (<a href="https://sheets.new" target="_blank" rel="noopener">sheets.new</a>) and name it, for example “IS study”. Then choose <b>Extensions → Apps Script</b>.' }),
+        h('li', null, 'Choose an admin key (or keep this random one) and the email that should hear when someone finishes:',
+          h('div', { class: 'grid2', style: 'margin-top:6px' }, h('div', { class: 'fld' }, h('label', null, 'Admin key'), keyIn), h('div', { class: 'fld' }, h('label', null, 'Email for notifications'), email))),
+        h('li', null, 'Copy the script, replace everything in Apps Script with it, and save. ',
+          h('span', { class: 'row', style: 'margin-top:6px' },
+            h('button', { class: 'btn', type: 'button', onclick: async () => { try { await navigator.clipboard.writeText(script()); toast('Script copied.'); } catch (e) { toast('Copy failed: use Download instead.'); } } }, 'Copy the script'),
+            h('button', { class: 'btn quiet', type: 'button', onclick: () => download('Code.gs', script(), 'text/plain') }, 'Download Code.gs'))),
+        h('li', { html: '<b>Deploy → New deployment</b>, type <b>Web app</b>, Execute as <b>Me</b>, Who has access <b>Anyone</b>. Approve the permissions, then copy the <b>Web app URL</b>.' }),
+        h('li', null, 'Paste the URL and the admin key above and choose Connect.')),
+      h('p', { class: 'note' }, 'If you change the script later: Deploy → Manage deployments → pencil → Version: New version, so the URL stays the same.'));
+  }
+  function setDraft(c) {
+    E.draft = c;
+    (c.methods || []).forEach(m => { m.elements = m.elements || {}; m.questions = m.questions || []; m.rubric = m.rubric || { mechanism: '', procedure: [], output: '', mistakes: '', checks: '' }; });
+    if (!E.method || !c.methods.some(m => m.id === E.method)) E.method = c.methods[0] && c.methods[0].id;
+  }
+  async function connect() {
+    E.conn = await api('ping'); E.offline = false; E.status = E.conn.status; E.published = E.conn.published;
+    const d = await api('getDraft');
+    E.published = d.published;
+    E.publishedContent = d.published ? (await api('getVersion', { v: d.published })).content : null;
+    const local = ls.get('ise-draft');
+    if (d.draft) {
+      if (local && local.backend === E.backend && local.content && local.at && (!d.draft.editedAt || local.at > d.draft.editedAt) && stripMeta(local.content) !== stripMeta(d.draft)) {
+        const useLocal = await confirmBox('This browser has newer changes', 'The copy in this browser was edited after the draft in the Sheet was saved. Keep the browser’s copy (and save it to the Sheet), or use the Sheet’s draft?', 'Keep this browser’s copy');
+        setDraft(useLocal ? local.content : d.draft);
+        E.savedAt = d.saved; E.dirty = false;
+        if (useLocal) await pushDraft();
+      } else { setDraft(d.draft); E.savedAt = d.saved; E.dirty = false; }
+      if (E.section === 'connect') E.section = 'overview';
+    }
+    drawStatus();
+  }
+
+  /* =============================== Overview =============================== */
+  function secOverview(main) {
+    const c = D();
+    main.append(h('h2', null, c.title || 'Study'), h('p', { class: 'lead' }, 'Links to send, the study’s status, and how many people have taken part.'));
+    if (!E.conn) main.append(h('div', { class: 'msg amber' }, 'Not connected: you can edit and preview, but publishing, links and data need the backend (Connect).'));
+    if (c.methods.some(m => m.source === 'preview')) main.append(h('div', { class: 'msg bad', html: '<b>Some methods still use the paraphrased preview text.</b> Participants would see a red “Preview content” banner. Import the ReMeDe pages under Methods before collecting data.' }));
+    // status
+    if (E.conn) {
+      const open = E.status === 'open';
+      main.append(h('div', { class: 'card' }, h('h4', null, 'Study status'),
+        h('p', { class: 'note' }, open ? 'Open: new participants can start. ' + (E.published ? 'They get version ' + E.published + '.' : 'Nothing is published yet, so the links show “not open yet”.') : 'Closed: the links show a closed message. People already part-way through can still finish.'),
+        h('div', { class: 'row' }, h('button', { class: 'btn' + (open ? '' : ' primary'), type: 'button', onclick: async () => {
+          try { const r = await api('setStatus', { status: open ? 'closed' : 'open' }); E.status = r.status; render(); toast(r.status === 'open' ? 'The study is open.' : 'The study is closed.'); } catch (e) { toast(e.message, 6000); }
+        } }, open ? 'Close the study' : 'Open the study'),
+          differsFromPublished() ? h('span', { class: 'note' }, 'The draft has changes that participants do not see yet. ') : null,
+          differsFromPublished() ? h('button', { class: 'btn quiet sm', type: 'button', onclick: () => { E.section = 'publish'; render(); } }, 'Publish…') : null)));
+    }
+    // links
+    const card = h('div', { class: 'card' }, h('h4', null, 'Links for participants'));
+    if (!E.conn) card.append(h('p', { class: 'note' }, 'Connect to the backend to get the links.'));
+    else {
+      const base = siteBase() + 'index.html?b=' + backendParam() + '&g=';
+      c.groups.forEach(g => {
+        card.append(h('div', { class: 'note', style: 'margin-top:8px;font-weight:600;color:var(--ink-2)' }, g.label));
+        [['', 'Main study'], ['&pilot=1', 'Pilot (kept apart from the main data)'], ['&pilot=nopage', 'No-page pilot (questions without the method text)']].forEach(([suf, lab]) => {
+          const link = base + g.id + suf;
+          const inp = h('input', { value: link, readonly: true, 'aria-label': g.label + ': ' + lab });
+          card.append(h('div', { class: 'linkbox' }, h('span', { class: 'note', style: 'width:250px' }, lab), inp,
+            h('button', { class: 'btn sm quiet', type: 'button', onclick: async () => { try { await navigator.clipboard.writeText(link); toast('Link copied.'); } catch (e) { inp.select(); } } }, 'Copy'),
+            h('a', { class: 'btn sm quiet', href: link, target: '_blank', rel: 'noopener' }, 'Open')));
+        });
+      });
+    }
+    main.append(card);
+    // preview
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Preview the draft'), h('p', { class: 'note' }, 'Runs the whole study with the draft as it is now, in a new tab. Nothing is saved.'),
+      h('div', { class: 'row' }, c.groups.map(g => h('button', { class: 'btn', type: 'button', onclick: () => preview({ g: g.id }) }, 'Preview as ' + g.label.toLowerCase())))));
+    // counts
+    const cc = h('div', { class: 'card' }, h('h4', null, 'Participants'));
+    main.append(cc);
+    if (E.conn) loadCounts(cc);
+  }
+  async function loadCounts(box) {
+    try {
+      const r = await api('participants'); E.parts = r.participants;
+      const conds = D().pairs.flatMap(p => [p.id + '1', p.id + '2']);
+      const main = E.parts.filter(p => !p.pilot);
+      const tbl = h('table', { class: 't' }, h('tr', null, h('th', null, 'Group'), conds.map(c => h('th', { class: 'c' }, c)), h('th', { class: 'c' }, 'Finished'), h('th', { class: 'c' }, 'In progress'), h('th', { class: 'c' }, 'Withdrawn')));
+      D().groups.forEach(g => {
+        const mine = main.filter(p => p.group === g.id);
+        tbl.append(h('tr', null, h('td', null, g.label), conds.map(c => h('td', { class: 'c' }, String(mine.filter(p => p.condition === c && p.status === 'completed').length))),
+          h('td', { class: 'c' }, String(mine.filter(p => p.status === 'completed').length) + (g.max ? ' / ' + g.max : '')),
+          h('td', { class: 'c' }, String(mine.filter(p => p.status === 'started' || p.status === 'in progress').length)),
+          h('td', { class: 'c' }, String(mine.filter(p => p.status === 'withdrawn').length))));
+      });
+      const pil = E.parts.filter(p => p.pilot);
+      box.append(h('div', { class: 'scroll' }, tbl), h('p', { class: 'note' }, 'Finished participants per condition (main study only). Pilot sessions: ' + pil.filter(p => p.status === 'completed').length + ' finished, ' + pil.length + ' started.'));
+    } catch (e) { box.append(h('div', { class: 'msg bad' }, e.message)); }
+  }
+  function preview(q) {
+    if (!ls.set('is-study-preview', D())) { toast('The browser would not store the preview.'); return; }
+    const u = new URL(siteBase() + 'index.html'); u.searchParams.set('preview', '1');
+    Object.entries(q).forEach(([k, v]) => { if (v != null) u.searchParams.set(k, v); });
+    window.open(u.toString(), '_blank', 'noopener');
+  }
+
+  /* =============================== Texts =============================== */
+  function secTexts(main) {
+    const c = D(), t = c.texts;
+    main.append(h('h2', null, 'Texts'), h('p', { class: 'lead', html: 'Everything participants read outside the method pages. Longer texts use simple formatting: <code>**bold**</code>, <code>### heading</code>, lists starting with <code>1.</code> or <code>-</code>, and links <code>[text](https://…)</code>. Placeholders: <code>{duration}</code>, <code>{name}</code>, <code>{affiliation}</code>, <code>{email}</code>, <code>{purpose}</code>, <code>{teachline}</code>.' }));
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Study and researcher'),
+      field('Study title (shown at the top of the consent page)', c, 'title'),
+      h('div', { class: 'grid3' }, field('Researcher', c.researcher, 'name'), field('Affiliation', c.researcher, 'affiliation'), field('Contact email', c.researcher, 'email'))));
+    const gc = h('div', { class: 'card' }, h('h4', null, 'Groups'), h('p', { class: 'note' }, 'Each group has its own link. A limit stops new people joining once that many have finished (0 = no limit).'));
+    c.groups.forEach(g => gc.append(h('div', { class: 'grid4' }, field('Name (' + g.id + ')', g, 'label'), field('Duration, as said to them', g, 'duration'), field('Limit of finished participants', g, 'max', { type: 'number', empty: 0 }),
+      h('div', null, field('Includes the teaching part', g, 'teach', { type: 'check' }), field('Purpose (for the rating of parts)', g, 'purpose')))));
+    main.append(gc);
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Consent'), field('Title', t, 'consentTitle'), field('Text', t, 'consent', { type: 'md', tall: true }),
+      field('Tick boxes (one per line; all must be ticked)', t, 'checks', { type: 'lines', rows: 3 }), field('Message if someone declines', t, 'declined')));
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Introduction'), field('Title', t, 'infoTitle'), field('Text', t, 'info', { type: 'md', tall: true }),
+      field('Extra line for groups with the teaching part ({teachline})', t, 'teachline', { type: 'md', rows: 2 }),
+      h('div', { class: 'grid2' }, field('“About you” title', t, 'aboutTitle'), field('“About you” intro', t, 'aboutIntro')),
+      field('Between the two methods', t, 'between'), field('No-page pilot: shown instead of the method text', t, 'nopage', { type: 'textarea', rows: 2 })));
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Method parts'),
+      h('div', { class: 'grid2' }, field('Part 1 title', t, 'partATitle'), field('Part 1 instruction', t, 'partAIntro')),
+      h('div', { class: 'grid2' }, field('Part 2 title', t, 'partBTitle'), field('Label of the answer box', t, 'workLabel')),
+      field('Part 2 instruction', t, 'partB', { type: 'textarea', rows: 3 }),
+      h('div', { class: 'fld' }, h('div', { class: 'lab' }, 'Scenario shown above every task input'), rich(t, 'scenario', { rich: true, label: 'Scenario' })),
+      h('div', { class: 'grid2' }, field('Part 3 (teaching) title', t, 'partCTitle'), field('Part 3 instruction', t, 'partCIntro')),
+      field('Teaching prompt 1', t, 'plan', { type: 'textarea', rows: 2 }), field('Teaching prompt 2', t, 'mistake', { type: 'textarea', rows: 2 })));
+    const rc = h('div', { class: 'card' }, h('h4', null, 'Ratings in the method parts (7 points)'));
+    [['ease', 'After the questions'], ['conf', 'After the task (confidence)'], ['useful', 'After the task (usefulness)'], ['teachuse', 'After teaching']].forEach(([k, lab]) => {
+      rc.append(h('div', { class: 'grid3' }, field(lab, t[k], 't'), field('1 =', t[k], 'lo'), field('7 =', t[k], 'hi')));
+    });
+    main.append(rc);
+    main.append(h('div', { class: 'card' }, h('h4', null, 'End and other messages'),
+      h('div', { class: 'grid2' }, field('“Your views” title', t, 'viewsTitle'), field('“Your views” intro', t, 'viewsIntro')),
+      field('Thank-you title', t, 'endTitle'), field('Thank-you message', t, 'endMessage', { type: 'md', rows: 3 }),
+      field('Study closed', t, 'closed', { type: 'textarea', rows: 2 }), field('Group full', t, 'full', { type: 'textarea', rows: 2 }),
+      field('After withdrawing', t, 'withdrawn', { type: 'textarea', rows: 2 })));
+  }
+
+  /* =============================== questionnaire items =============================== */
+  const TYPES = [['single', 'One choice'], ['multi', 'Several choices'], ['likert', 'Rating scale'], ['number', 'Number'], ['text', 'Short text'], ['textarea', 'Long text'], ['note', 'Note (no answer)'], ['methodgrid', 'Grid: one row per method'], ['cvr', 'Grid: one row per element (content validity)']];
+  function secItems(which) {
+    const list = D()[which];
+    main_(which === 'about' ? 'About you' : 'Your views', which === 'about'
+      ? 'Background questions, asked after the introduction. An item can be limited to some groups.'
+      : 'The last page. Items marked “only with method pages” are skipped in the no-page pilot.');
+    const box = h('div');
+    const draw = () => {
+      box.innerHTML = '';
+      list.forEach((it, i) => box.append(itemCard(list, i, draw)));
+      const typeSel = h('select', { class: 'in', style: 'width:auto' }, TYPES.map(([v, l]) => h('option', { value: v }, l)));
+      box.append(h('div', { class: 'row' }, typeSel, h('button', { class: 'btn', type: 'button', onclick: () => {
+        const tp = typeSel.value, n = list.length + 1;
+        const it = { type: tp, var: tp === 'note' ? '' : (which === 'about' ? 'a' : 'v') + n, t: 'New question', req: tp !== 'note' && tp !== 'textarea' };
+        if (tp === 'single' || tp === 'multi') it.options = ['First option', 'Second option'];
+        if (tp === 'likert') Object.assign(it, { points: 5, lo: 'Not at all', hi: 'Completely' });
+        if (tp === 'methodgrid') Object.assign(it, { var: 'fam', points: 5, lo: 'Never heard of it', hi: 'Use it regularly' });
+        if (tp === 'cvr') Object.assign(it, { var: 'e', points: 3, lo: 'Not necessary', mid: 'Useful but not essential', hi: 'Essential' });
+        list.push(it); changed(); draw();
+      } }, 'Add an item')));
+    };
+    draw(); $('#main').append(box);
+  }
+  function main_(title, lead) { $('#main').append(h('h2', null, title), h('p', { class: 'lead' }, lead)); }
+  function itemCard(list, i, redraw) {
+    const it = list[i];
+    const groups = D().groups;
+    const typeSel = h('select', { class: 'in', style: 'width:auto' }, TYPES.map(([v, l]) => h('option', { value: v, selected: v === it.type }, l)));
+    typeSel.addEventListener('change', () => { it.type = typeSel.value; if ((it.type === 'single' || it.type === 'multi') && !it.options) it.options = ['First option', 'Second option']; if (it.type === 'likert' && !it.points) Object.assign(it, { points: 5, lo: 'Low', hi: 'High' }); changed(); redraw(); });
+    const head = h('div', { class: 'qhead' }, h('b', null, '#' + (i + 1)), typeSel, h('span', { class: 'grow' }),
+      iconBtn('↑', 'Move up', () => { if (move(list, i, -1)) { changed(); redraw(); } }, i === 0),
+      iconBtn('↓', 'Move down', () => { if (move(list, i, 1)) { changed(); redraw(); } }, i === list.length - 1),
+      iconBtn('⧉', 'Duplicate', () => { const c = clone(it); if (c.var) c.var += '_copy'; list.splice(i + 1, 0, c); changed(); redraw(); }),
+      iconBtn('✕', 'Delete', async () => { if (await confirmBox('Delete this item?', esc(it.t || it.type), 'Delete', true)) { list.splice(i, 1); changed(); redraw(); } }));
+    const body = h('div', { class: 'qbody' });
+    if (it.type !== 'note') body.append(h('div', { class: 'grid2' }, field('Variable name (column in the data)', it, 'var', { mono: true, hint: it.type === 'methodgrid' ? 'Columns are var_methodid, e.g. fam_5whys.' : it.type === 'cvr' ? 'Columns are var01, var02, …' : '' }),
+      h('div', null, field('Answer required', it, 'req', { type: 'check' }), field('Only with method pages (skip in the no-page pilot)', { get when() { return it.when === 'pages'; }, set when(v) { if (v) it.when = 'pages'; else delete it.when; } }, 'when', { type: 'check' }))));
+    body.append(field(it.type === 'note' ? 'Note text' : it.type === 'cvr' ? 'Heading' : 'Question', it, 't', { type: 'textarea', rows: 2 }));
+    if (it.type === 'single' || it.type === 'multi') {
+      body.append(field('Options (one per line)', it, 'options', { type: 'lines', rows: Math.max(3, (it.options || []).length + 1) }));
+      if (it.type === 'single') body.append(field('Add an “Other” option with a text box', it, 'other', { type: 'check' }));
+      if (it.type === 'multi') body.append(field('Option that clears the others (e.g. “No outside help”)', it, 'exclusive', { ph: 'leave empty for none' }));
+    }
+    if (it.type === 'likert' || it.type === 'methodgrid' || it.type === 'cvr') {
+      body.append(h('div', { class: 'grid4' }, field('Points', it, 'points', { type: 'number' }), field('Label for 1', it, 'lo'), field('Label for the middle (optional)', it, 'mid'), field('Label for the top', it, 'hi')));
+    }
+    if (it.type === 'methodgrid' || it.type === 'cvr') body.append(field('Legend shown above the grid', it, 'note', { type: 'textarea', rows: 2 }));
+    if (it.type === 'cvr') {
+      body.append(field('Instruction ({purpose} becomes the group’s purpose)', it, 'intro', { type: 'textarea', rows: 2 }));
+      const a = it.attn || {};
+      const on = { get v() { return !!it.attn; }, set v(x) { if (x) it.attn = it.attn || { after: 9, var: 'attn', value: 2, t: 'To show you are reading carefully, please choose 2 for this row.' }; else delete it.attn; } };
+      body.append(field('Include an attention-check row', on, 'v', { type: 'check', onchange: () => redraw() }));
+      if (it.attn) body.append(h('div', { class: 'grid4' }, field('After row', it.attn, 'after', { type: 'number' }), field('Correct answer', it.attn, 'value', { type: 'number' }), field('Variable', it.attn, 'var', { mono: true }), field('Row text', it.attn, 't')));
+      body.append(h('p', { class: 'note' }, 'The rows are the elements listed under “Elements and core page”.'));
+    }
+    if (it.type === 'number') body.append(h('div', { class: 'grid2' }, field('Lowest allowed', it, 'min', { type: 'number' }), field('Highest allowed', it, 'max', { type: 'number' })));
+    const gbox = h('div', { class: 'row' }, h('span', { class: 'note' }, 'Shown to:'));
+    groups.forEach(g => {
+      const cb = h('input', { type: 'checkbox', checked: !it.groups || !it.groups.length || it.groups.includes(g.id) });
+      cb.addEventListener('change', () => {
+        const all = groups.map(x => x.id);
+        let cur = !it.groups || !it.groups.length ? all.slice() : it.groups.slice();
+        cur = cb.checked ? Array.from(new Set(cur.concat(g.id))) : cur.filter(x => x !== g.id);
+        if (cur.length === all.length) delete it.groups; else it.groups = cur;
+        changed();
+      });
+      gbox.append(h('label', { style: 'display:inline-flex;gap:4px;align-items:center;font-size:13px' }, cb, g.label));
+    });
+    body.append(gbox);
+    return h('div', { class: 'qcard' }, head, body);
+  }
+
+  /* =============================== Methods =============================== */
+  function secMethods(main) {
+    const c = D();
+    let m = c.methods.find(x => x.id === E.method) || c.methods[0];
+    main.append(h('h2', null, 'Methods'), h('p', { class: 'lead' }, 'Each method’s page content, its task, its questions with the answer keys, and the rubric the raters use.'));
+    const pick = h('div', { class: 'row', style: 'margin-bottom:14px' }, c.methods.map(x => h('button', { class: 'btn sm' + (x === m ? ' primary' : ' quiet'), type: 'button', onclick: () => { E.method = x.id; render(); } }, x.name || x.id, h('span', { class: 'chip ' + (x.source || '') }, x.source || 'edited'))),
+      h('button', { class: 'btn sm', type: 'button', onclick: addMethod }, '+ Add a method'));
+    main.append(pick);
+    if (!m) return;
+    E.method = m.id;
+    const tabs = [['details', 'Details and import'], ['content', 'Page content'], ['task', 'Task input'], ['questions', 'Questions'], ['rubric', 'Rubric']];
+    main.append(h('div', { class: 'tabs2', role: 'tablist' }, tabs.map(([k, l]) => h('button', { type: 'button', class: E.mtab === k ? 'on' : '', role: 'tab', onclick: () => { E.mtab = k; render(); } }, l))));
+    ({ details: methodDetails, content: methodContent, task: methodTask, questions: methodQuestions, rubric: methodRubric }[E.mtab] || methodDetails)(main, m);
+  }
+  async function addMethod() {
+    const c = D();
+    let n = c.methods.length + 1, id = 'm' + n; while (c.methods.some(x => x.id === id)) id = 'm' + (++n);
+    c.methods.push({ id, name: 'New method', file: '', phase: '', source: 'edited', elements: {}, input: '<p>Describe the task input here.</p>',
+      questions: [], rubric: { mechanism: '', procedure: [], output: '', mistakes: '', checks: '' } });
+    E.method = id; E.mtab = 'details'; changed(); render();
+    toast('Added. Put it in a pair (Pairs and conditions) to use it.');
+  }
+  function methodDetails(main, m) {
+    const c = D();
+    const used = c.pairs.find(p => p.methods.includes(m.id));
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Details'),
+      h('div', { class: 'grid2' }, field('Name', m, 'name', { nav: true }), field('Design phase', m, 'phase')),
+      h('div', { class: 'grid2' }, field('File name in ReMeDe (without .html)', m, 'file'),
+        field('ID (used in the data)', m, 'id', { mono: true, hint: 'Changing it updates the pairs; avoid changing it once data collection has started.', onchange: v => {
+          c.pairs.forEach(p => { p.methods = p.methods.map(x => x === E.method ? v : x); }); E.method = v;
+        } })),
+      h('p', { class: 'note' }, used ? 'Used in pair ' + used.id + '.' : 'Not in any pair, so participants do not see it.'),
+      h('div', { class: 'row' }, h('button', { class: 'btn danger sm', type: 'button', onclick: async () => {
+        if (!await confirmBox('Delete ' + esc(m.name) + '?', 'Its content, questions and rubric are removed from the draft' + (used ? ', and pair ' + used.id + ' loses it' : '') + '. Published versions keep it.', 'Delete the method', true)) return;
+        c.methods = c.methods.filter(x => x !== m); c.pairs.forEach(p => { p.methods = p.methods.map(x => x === m.id ? '' : x); }); E.method = c.methods[0] && c.methods[0].id; changed(); render();
+      } }, 'Delete this method'))));
+    // provenance and import
+    const src = { preview: 'Paraphrased preview text, for testing only.', remede: 'Copied from ReMeDe' + (m.importedAt ? ' on ' + m.importedAt.slice(0, 10) : '') + ', unchanged.', edited: 'Edited by hand' + (m.importedAt ? ' after importing from ReMeDe on ' + m.importedAt.slice(0, 10) : '') + '.' }[m.source] || 'Edited by hand.';
+    const out = h('div');
+    const base = h('input', { class: 'in mono', value: c.remede || '' });
+    base.addEventListener('input', () => { c.remede = base.value.trim(); changed({ nav: false }); });
+    const fileIn = h('input', { type: 'file', accept: '.html,.htm,text/html', style: 'display:none' });
+    const take = async (html, from) => {
+      const r = parseRemede(html, c.elements.map(e => e.name));
+      out.innerHTML = '';
+      out.append(h('div', { class: 'msg ' + (r.missing.length ? 'amber' : 'ok') }, 'Found ' + (c.elements.length - r.missing.length) + ' of ' + c.elements.length + ' elements.' +
+        (r.missing.length ? ' Missing: ' + r.missing.join(', ') + ' (their current text is kept).' : '') + (r.extra.length ? ' Other headings left out: ' + r.extra.join(', ') + '.' : '')));
+      const apply = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
+        Object.assign(m.elements, r.elements);
+        m.source = r.missing.length ? 'edited' : 'remede'; m.importedAt = new Date().toISOString(); m.importedFrom = from; m.sha256 = await sha256(html);
+        delete m.note; changed(); render(); toast('Imported ' + Object.keys(r.elements).length + ' elements into ' + m.name + '.');
+      } }, 'Use this text');
+      out.append(h('div', { class: 'row' }, apply, h('span', { class: 'note' }, 'Replaces the found elements in the draft. Check them under Page content, then publish.')));
+    };
+    fileIn.addEventListener('change', async () => { const f = fileIn.files[0]; if (f) await take(await f.text(), 'local file: ' + f.name); fileIn.value = ''; });
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Text source'), h('p', null, h('span', { class: 'chip ' + (m.source || 'edited') }, m.source || 'edited'), ' ', src),
+      m.sha256 ? h('p', { class: 'note' }, 'SHA-256 of the imported page: ', h('code', null, m.sha256)) : null,
+      h('div', { class: 'fld' }, h('label', null, 'Folder of the ReMeDe method pages'), base),
+      h('div', { class: 'row' }, h('button', { class: 'btn', type: 'button', onclick: async () => {
+        out.innerHTML = 'Fetching…';
+        const url = c.remede.replace(/\/?$/, '/') + encodeURIComponent((m.file || m.name) + (/\.html?$/i.test(m.file || '') ? '' : '.html'));
+        try { const res = await fetch(url, { cache: 'no-store' }); if (!res.ok) throw new Error('HTTP ' + res.status); await take(await res.text(), url); }
+        catch (e) { out.innerHTML = ''; out.append(h('div', { class: 'msg bad' }, 'Could not fetch ' + url + ' (' + e.message + '). Load the HTML file from your computer instead.')); }
+      } }, 'Import from ReMeDe'), fileIn, h('button', { class: 'btn quiet', type: 'button', onclick: () => fileIn.click() }, 'Import an HTML file…'),
+        m.source === 'preview' ? h('button', { class: 'btn quiet', type: 'button', onclick: () => { m.source = 'edited'; delete m.note; changed(); render(); } }, 'Mark the current text as final') : null), out));
+  }
+  function methodContent(main, m) {
+    const c = D();
+    main.append(h('div', { class: 'row', style: 'margin-bottom:10px' }, h('span', { class: 'note' }, 'Preview this page:'),
+      ['is', 'core', 'none'].map(f => h('button', { class: 'btn sm quiet', type: 'button', onclick: () => preview({ g: c.groups[0].id, m: m.id, f }) }, { is: 'IS page', core: 'Core page', none: 'No page' }[f]))));
+    const inCore = new Set(c.core.flatMap(s => s.elements));
+    c.elements.forEach(e => {
+      main.append(h('div', { class: 'elhead' }, h('h4', null, e.name), h('span', { class: 'note' }, inCore.has(e.name) ? 'on both pages' : 'IS page only')));
+      main.append(rich(m.elements, e.name, { label: e.name, onchange: () => { if (m.source === 'remede') m.source = 'edited'; } }));
+    });
+  }
+  function methodTask(main, m) {
+    main.append(h('p', { class: 'lead' }, 'The short input participants apply the method to. The scenario (under Texts) is shown above it. Layout HTML such as the phone screens is allowed here.'));
+    main.append(rich(m, 'input', { rich: true, label: 'Task input' }));
+  }
+  function methodQuestions(main, m) {
+    const qs = m.questions;
+    const on = qs.filter(q => q.on);
+    const keys = on.map(q => q.key).join(' ');
+    main.append(h('p', { class: 'lead' }, 'Questions in use: ' + on.length + (on.length ? ' (keys ' + keys + ')' : '') + '. Questions switched off stay in the draft but participants do not see them. “Answerable from the core page” marks the fair questions used for the comparison.'));
+    const box = h('div'); main.append(box);
+    const draw = () => {
+      box.innerHTML = '';
+      qs.forEach((q, i) => box.append(questionCard(m, i, draw)));
+      box.append(h('div', { class: 'row' }, h('button', { class: 'btn', type: 'button', onclick: () => {
+        let n = qs.length + 1; while (qs.some(x => x.id === 'q' + n)) n++;
+        qs.push({ id: 'q' + n, on: true, kind: 'other', core: true, stem: '', options: ['', '', '', ''], key: 'A', source: '' }); changed(); draw();
+      } }, 'Add a question')));
+    };
+    draw();
+  }
+  const KINDS = ['purpose', 'sequence', 'mechanism', 'correct-use', 'planning', 'other'];
+  function questionCard(m, i, redraw) {
+    const q = m.questions[i], qs = m.questions;
+    const onBox = h('input', { type: 'checkbox', checked: !!q.on });
+    onBox.addEventListener('change', () => { q.on = onBox.checked; changed(); redraw(); });
+    const coreBox = h('input', { type: 'checkbox', checked: !!q.core });
+    coreBox.addEventListener('change', () => { q.core = coreBox.checked; changed(); });
+    const kind = h('select', { class: 'in', style: 'width:auto' }, KINDS.map(k => h('option', { value: k, selected: k === q.kind }, k)));
+    kind.addEventListener('change', () => { q.kind = kind.value; changed(); });
+    const head = h('div', { class: 'qhead' }, h('b', null, q.id), h('label', null, onBox, 'In use'), kind, h('label', null, coreBox, 'Answerable from the core page'), h('span', { class: 'grow' }),
+      iconBtn('↑', 'Move up', () => { if (move(qs, i, -1)) { changed(); redraw(); } }, i === 0),
+      iconBtn('↓', 'Move down', () => { if (move(qs, i, 1)) { changed(); redraw(); } }, i === qs.length - 1),
+      iconBtn('✕', 'Delete', async () => { if (await confirmBox('Delete ' + q.id + '?', esc(q.stem), 'Delete', true)) { qs.splice(i, 1); changed(); redraw(); } }));
+    const body = h('div', { class: 'qbody' }, field('Question', q, 'stem', { type: 'textarea', rows: 2 }));
+    const lens = h('div', { class: 'lenbar' });
+    const drawLens = () => {
+      const L = q.options.map(o => (o || '').length), mx = Math.max(...L), mn = Math.min(...L);
+      const k = 'ABCD'.indexOf(q.key);
+      lens.textContent = 'Lengths ' + L.join(' · ') + ' characters' + (mn ? ' · longest/shortest ' + (mx / mn).toFixed(2) : '') + (L[k] === mx && L.filter(x => x === mx).length === 1 ? ' · the correct answer is the longest option (a cue)' : '');
+    };
+    q.options.forEach((o, j) => {
+      const L = 'ABCD'[j];
+      const rb = h('input', { type: 'radio', name: 'key-' + m.id + '-' + q.id + '-' + i, checked: q.key === L });
+      rb.addEventListener('change', () => { q.key = L; changed(); redraw(); });
+      const inp = h('input', { class: 'in', value: o, 'aria-label': 'Option ' + L });
+      inp.addEventListener('input', () => { q.options[j] = inp.value; changed({ nav: false }); drawLens(); });
+      body.append(h('div', { class: 'opt-row' + (q.key === L ? ' right' : '') }, h('label', { class: 'key', title: 'Correct answer' }, rb, L), inp));
+    });
+    drawLens();
+    body.append(lens, field('Where the page gives the answer (for the expert check)', q, 'source'));
+    return h('div', { class: 'qcard' + (q.on ? '' : ' off') }, head, body);
+  }
+  function methodRubric(main, m) {
+    const r = m.rubric;
+    main.append(h('p', { class: 'lead' }, 'Anchors for the two blind raters. They go into the rating sheets the analysis kit makes; participants never see them.'));
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Using the method (Part 2), each criterion 0–2'),
+      field('Mechanism: what full marks look like', r, 'mechanism', { type: 'textarea', rows: 3 }),
+      field('Procedure: the key steps, one per line', r, 'procedure', { type: 'lines', rows: 5 }),
+      field('Output: what full marks look like', r, 'output', { type: 'textarea', rows: 3 })));
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Teaching (Part 3, educators)'),
+      field('Typical mistakes (examples for the “mistake” criterion)', r, 'mistakes', { type: 'textarea', rows: 2 }),
+      field('Checks of correct use (examples for the “check” criterion)', r, 'checks', { type: 'textarea', rows: 2 })));
+  }
+
+  /* =============================== Elements and core page =============================== */
+  function secElements(main) {
+    const c = D();
+    main.append(h('h2', null, 'Elements and core page'), h('p', { class: 'lead' }, 'The 18 elements are the IS page, in this order, and the rows participants rate at the end. The core page shows only the sections below, built from the same text.'));
+    const box = h('div', { class: 'card' }, h('h4', null, 'Elements of the information structure'));
+    c.elements.forEach((e, i) => {
+      const nameIn = h('input', { class: 'in', value: e.name, 'aria-label': 'Element ' + (i + 1) + ' name' });
+      nameIn.addEventListener('change', () => {
+        const old = e.name, nu = nameIn.value.trim(); if (!nu || nu === old) { nameIn.value = old; return; }
+        if (c.elements.some(x => x !== e && x.name === nu)) { toast('Another element already has that name.'); nameIn.value = old; return; }
+        e.name = nu;
+        c.methods.forEach(m => { if (old in m.elements) { m.elements[nu] = m.elements[old]; delete m.elements[old]; } });
+        c.core.forEach(s => { s.elements = s.elements.map(x => x === old ? nu : x); });
+        changed(); render();
+      });
+      const desc = h('input', { class: 'in', value: e.desc, 'aria-label': 'Element ' + (i + 1) + ' description' });
+      desc.addEventListener('input', () => { e.desc = desc.value; changed({ nav: false }); });
+      box.append(h('div', { style: 'display:grid;grid-template-columns:28px 220px 1fr auto auto auto;gap:6px;align-items:center;margin:4px 0' }, h('span', { class: 'note' }, String(i + 1)), nameIn, desc,
+        iconBtn('↑', 'Move up', () => { if (move(c.elements, i, -1)) { changed(); render(); } }, i === 0),
+        iconBtn('↓', 'Move down', () => { if (move(c.elements, i, 1)) { changed(); render(); } }, i === c.elements.length - 1),
+        iconBtn('✕', 'Delete', async () => { if (await confirmBox('Delete the element “' + esc(e.name) + '”?', 'Its text is removed from every method in the draft, and the rating rows renumber.', 'Delete', true)) { c.elements.splice(i, 1); c.methods.forEach(m => { delete m.elements[e.name]; }); c.core.forEach(s => { s.elements = s.elements.filter(x => x !== e.name); }); changed(); render(); } })));
+    });
+    box.append(h('div', { class: 'row', style: 'margin-top:8px' }, h('button', { class: 'btn sm', type: 'button', onclick: () => { let n = 1; while (c.elements.some(x => x.name === 'New element ' + n)) n++; c.elements.push({ name: 'New element ' + n, desc: '' }); changed(); render(); } }, 'Add an element')),
+      h('p', { class: 'note' }, 'Renaming keeps each method’s text. Changing the elements changes the rating columns (e01, e02, …), so settle them before data collection.'));
+    main.append(box);
+    const core = h('div', { class: 'card' }, h('h4', null, 'Core page sections'), h('p', { class: 'note' }, 'Each section has a heading and shows the text of the ticked elements, one after the other.'));
+    c.core.forEach((s, i) => {
+      const row = h('div', { class: 'qcard' }, h('div', { class: 'qhead' }, h('b', null, String(i + 1)), h('span', { class: 'grow' }),
+        iconBtn('↑', 'Move up', () => { if (move(c.core, i, -1)) { changed(); render(); } }, i === 0),
+        iconBtn('↓', 'Move down', () => { if (move(c.core, i, 1)) { changed(); render(); } }, i === c.core.length - 1),
+        iconBtn('✕', 'Delete', () => { c.core.splice(i, 1); changed(); render(); })), field('Heading', s, 'heading'));
+      const ticks = h('div', { class: 'row' });
+      c.elements.forEach(e => {
+        const cb = h('input', { type: 'checkbox', checked: s.elements.includes(e.name) });
+        cb.addEventListener('change', () => { const all = c.elements.map(x => x.name); const set = new Set(s.elements); if (cb.checked) set.add(e.name); else set.delete(e.name); s.elements = all.filter(n => set.has(n)); changed(); });
+        ticks.append(h('label', { style: 'display:inline-flex;gap:4px;align-items:center;font-size:13px;margin-right:6px' }, cb, e.name));
+      });
+      row.append(ticks); core.append(row);
+    });
+    core.append(h('button', { class: 'btn sm', type: 'button', onclick: () => { c.core.push({ heading: 'New section', elements: [] }); changed(); render(); } }, 'Add a section'));
+    main.append(core);
+  }
+
+  /* =============================== Pairs =============================== */
+  function secPairs(main) {
+    const c = D();
+    main.append(h('h2', null, 'Pairs and conditions'), h('p', { class: 'lead' }, 'Each participant gets one pair: the first method, then the second, one on the IS page and one on the core page. Every pair makes two conditions, and the backend fills them in turn within each group.'));
+    const box = h('div', { class: 'card' });
+    const opts = [['', '— choose —']].concat(c.methods.map(m => [m.id, m.name]));
+    c.pairs.forEach((p, i) => {
+      const sel = j => { const s = h('select', { class: 'in' }, opts.map(([v, l]) => h('option', { value: v, selected: p.methods[j] === v }, l))); s.addEventListener('change', () => { p.methods[j] = s.value; changed(); render(); }); return s; };
+      const n = id => (c.methods.find(m => m.id === id) || {}).name || '—';
+      box.append(h('div', { style: 'display:grid;grid-template-columns:60px 1fr 1fr auto;gap:8px;align-items:center;margin:6px 0' }, h('b', null, 'Pair ' + p.id), sel(0), sel(1),
+        iconBtn('✕', 'Delete pair', () => { c.pairs.splice(i, 1); changed(); render(); })));
+      box.append(h('p', { class: 'note', style: 'margin:0 0 10px 68px' }, p.id + '1: ' + n(p.methods[0]) + ' on the IS page, then ' + n(p.methods[1]) + ' on the core page · ' + p.id + '2: ' + n(p.methods[0]) + ' on the core page, then ' + n(p.methods[1]) + ' on the IS page'));
+    });
+    box.append(h('button', { class: 'btn sm', type: 'button', onclick: () => { let k = 0; while (c.pairs.some(p => p.id === String.fromCharCode(65 + k))) k++; c.pairs.push({ id: String.fromCharCode(65 + k), methods: ['', ''] }); changed(); render(); } }, 'Add a pair'));
+    main.append(box, h('p', { class: 'note' }, 'Changing the pairs during data collection changes which conditions exist; settle them first.'));
+    const cr = c.criteria = c.criteria || {};
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Success criteria and exclusions (for the analysis kit; participants never see them)'),
+      h('p', { class: 'note' }, 'Fix these before data collection and copy them into the preregistration. The analysis reads them from the data file.'),
+      h('div', { class: 'grid3' }, field('Understood: at least this many questions right', cr, 'understandMin', { type: 'number' }),
+        field('Competent use: task score at least (of 6)', cr, 'useMin', { type: 'number' }), field('…with a procedure score of at least (of 2)', cr, 'procedureMin', { type: 'number' })),
+      h('div', { class: 'grid3' }, field('Share to beat (p0, one-sided exact test)', cr, 'p0', { type: 'number' }), field('Expected share (for planning)', cr, 'target', { type: 'number' }),
+        field('Task answers shorter than this many characters exclude the block', cr, 'minWork', { type: 'number' })),
+      h('div', { class: 'grid2' }, field('Help answers that exclude a participant (one per line, exactly as the options read)', cr, 'excludeHelp', { type: 'lines', rows: 2 }),
+        field('Help answer reported but not excluded', cr, 'webHelp'))));
+  }
+
+  /* =============================== Checks =============================== */
+  const VAR = /^[A-Za-z][A-Za-z0-9_]*$/;
+  function runChecks() {
+    const c = D(), out = [];
+    const add = (level, text, go) => out.push({ level, text, go });
+    if (!c.groups || !c.groups.length) add('error', 'There are no groups.');
+    if (!c.pairs.length) add('error', 'There are no pairs, so nobody can be given a condition.', ['pairs']);
+    const used = new Set();
+    c.pairs.forEach(p => {
+      if (p.methods.length !== 2 || p.methods.some(x => !x)) add('error', 'Pair ' + p.id + ' needs two methods.', ['pairs']);
+      p.methods.forEach(x => { if (x && !c.methods.some(m => m.id === x)) add('error', 'Pair ' + p.id + ' refers to a method that no longer exists.', ['pairs']); });
+      if (p.methods[0] && p.methods[0] === p.methods[1]) add('error', 'Pair ' + p.id + ' has the same method twice.', ['pairs']);
+      p.methods.forEach(x => { if (used.has(x) && x) add('warn', 'A method appears in more than one pair.', ['pairs']); used.add(x); });
+    });
+    const ids = new Set();
+    c.methods.forEach(m => {
+      const go = ['methods', m.id];
+      if (ids.has(m.id)) add('error', 'Two methods share the ID “' + m.id + '”.', go); ids.add(m.id);
+      if (!VAR.test(m.id) && !/^[0-9a-z_-]+$/i.test(m.id)) add('error', m.name + ': the ID may use only letters, digits, - and _.', go);
+      if (!used.has(m.id)) { add('warn', (m.name || m.id) + ' is not in any pair, so participants do not see it.', ['pairs']); return; }
+      if (m.source === 'preview') add('warn', m.name + ' still has the paraphrased preview text (participants see a red banner).', go.concat('details'));
+      const empty = c.elements.filter(e => !plain((m.elements || {})[e.name]) && !/<img/i.test((m.elements || {})[e.name] || ''));
+      if (empty.length) add('error', m.name + ': empty element' + (empty.length > 1 ? 's' : '') + ' ' + empty.map(e => e.name).join(', ') + '.', go.concat('content'));
+      if (!plain(m.input)) add('error', m.name + ': the task input is empty.', go.concat('task'));
+      const on = m.questions.filter(q => q.on);
+      if (!on.length) add('error', m.name + ': no questions are in use.', go.concat('questions'));
+      on.forEach(q => {
+        if (!q.stem.trim()) add('error', m.name + ' ' + q.id + ': the question is empty.', go.concat('questions'));
+        if (q.options.length !== 4 || q.options.some(o => !String(o).trim())) add('error', m.name + ' ' + q.id + ': every question needs four options.', go.concat('questions'));
+        if (new Set(q.options.map(o => String(o).trim().toLowerCase())).size < q.options.length) add('error', m.name + ' ' + q.id + ': two options are the same.', go.concat('questions'));
+        if (!/^[ABCD]$/.test(q.key)) add('error', m.name + ' ' + q.id + ': no correct answer is chosen.', go.concat('questions'));
+        const L = q.options.map(o => String(o).length), k = 'ABCD'.indexOf(q.key);
+        if (k >= 0 && L[k] === Math.max(...L) && L.filter(x => x === L[k]).length === 1 && Math.max(...L) / Math.max(1, Math.min(...L)) > 1.25) add('warn', m.name + ' ' + q.id + ': the correct answer is clearly the longest option, a cue test-takers use.', go.concat('questions'));
+        if (!q.core) add('warn', m.name + ' ' + q.id + ' is in use but not answerable from the core page: keep it out of the comparison of understanding.', go.concat('questions'));
+      });
+      if (new Set(on.map(q => q.key)).size < on.length && on.length <= 4) add('warn', m.name + ': two questions in use share the same correct letter.', go.concat('questions'));
+      const r = m.rubric || {};
+      if (!r.mechanism || !(r.procedure || []).length || !r.output) add('warn', m.name + ': the rubric is incomplete.', go.concat('rubric'));
+    });
+    // answer letters across everything a participant sees
+    const all = c.methods.filter(m => used.has(m.id)).flatMap(m => m.questions.filter(q => q.on).map(q => q.key));
+    if (all.length >= 8) {
+      const cnt = 'ABCD'.split('').map(L => all.filter(x => x === L).length);
+      if (Math.max(...cnt) - Math.min(...cnt) > Math.max(2, Math.round(all.length * 0.15))) add('warn', 'Correct answers are unevenly spread over A–D (' + 'ABCD'.split('').map((L, i) => L + ' ' + cnt[i]).join(', ') + ').', ['checks']);
+    }
+    c.pairs.forEach(p => {
+      const seq = p.methods.flatMap(id => ((c.methods.find(m => m.id === id) || {}).questions || []).filter(q => q.on).map(q => q.key));
+      for (let i = 0; i + 2 < seq.length; i++) if (seq[i] === seq[i + 1] && seq[i] === seq[i + 2]) { add('warn', 'Pair ' + p.id + ': three questions in a row have the same correct letter.', ['pairs']); break; }
+    });
+    // questionnaires
+    ['about', 'views'].forEach(w => {
+      const seen = new Set();
+      c[w].forEach((it, i) => {
+        if (it.type === 'note') return;
+        const label = (w === 'about' ? 'About you' : 'Your views') + ' #' + (i + 1);
+        if (!VAR.test(it.var || '')) add('error', label + ': the variable name must start with a letter and use only letters, digits and _.', [w]);
+        const vs = it.type === 'cvr' ? c.elements.map((e, j) => it.var + String(j + 1).padStart(2, '0')).concat(it.attn ? [it.attn.var] : []) : it.type === 'methodgrid' ? c.methods.map(m => it.var + '_' + m.id) : [it.var];
+        vs.forEach(v => { if (seen.has(v)) add('error', label + ': the variable “' + v + '” is used twice.', [w]); seen.add(v); });
+        if ((it.type === 'single' || it.type === 'multi') && (it.options || []).length < 2) add('error', label + ': needs at least two options.', [w]);
+        if ((it.type === 'likert' || it.type === 'cvr' || it.type === 'methodgrid') && !(it.points >= 2 && it.points <= 11)) add('error', label + ': points must be between 2 and 11.', [w]);
+        if (it.type === 'cvr' && it.attn && !(it.attn.value >= 1 && it.attn.value <= it.points)) add('error', label + ': the attention check’s answer is outside the scale.', [w]);
+      });
+    });
+    if (!c.views.some(it => it.type === 'cvr')) add('warn', 'Your views has no element-rating grid, so there will be no content validity ratios.', ['views']);
+    const P = E.publishedContent;
+    if (P) {
+      if (JSON.stringify(P.elements.map(e => e.name)) !== JSON.stringify(c.elements.map(e => e.name))) add('warn', 'The elements differ from the published version: once data collection has started, this mixes up the element ratings (e01, e02, …) across versions.', ['elements']);
+      if (JSON.stringify(P.pairs) !== JSON.stringify(c.pairs)) add('warn', 'The pairs differ from the published version: once data collection has started, this changes what each condition means and upsets the balancing.', ['pairs']);
+    }
+    if (!c.texts.checks || !c.texts.checks.length) add('warn', 'The consent page has no tick boxes.', ['texts']);
+    return out;
+  }
+  function secChecks(main) {
+    const res = runChecks();
+    main.append(h('h2', null, 'Checks'), h('p', { class: 'lead' }, 'Errors stop publishing. Warnings are worth a look before data collection.'));
+    const card = h('div', { class: 'card' });
+    if (!res.length) card.append(h('div', { class: 'check' }, h('span', { class: 'lvl ok' }, 'OK'), h('span', null, 'Nothing to fix.'), h('span')));
+    res.sort((a, b) => (a.level === 'error' ? 0 : 1) - (b.level === 'error' ? 0 : 1)).forEach(r => card.append(h('div', { class: 'check' }, h('span', { class: 'lvl ' + r.level }, r.level === 'error' ? 'Error' : 'Warning'), h('span', null, r.text),
+      r.go ? h('button', { class: 'btn sm quiet', type: 'button', onclick: () => { E.section = r.go[0]; if (r.go[1]) E.method = r.go[1]; if (r.go[2]) E.mtab = r.go[2]; render(); } }, 'Go') : h('span'))));
+    main.append(card);
+    // the key at a glance
+    const c = D();
+    const tbl = h('table', { class: 't' }, h('tr', null, h('th', null, 'Pair'), h('th', null, 'Method'), h('th', null, 'Questions in use and keys')));
+    c.pairs.forEach(p => p.methods.forEach(id => { const m = c.methods.find(x => x.id === id); if (!m) return; tbl.append(h('tr', null, h('td', null, p.id), h('td', null, m.name), h('td', null, m.questions.filter(q => q.on).map(q => q.id + ' ' + q.key).join(' · ')))); }));
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Answer keys at a glance'), h('div', { class: 'scroll' }, tbl),
+      h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { class: 'btn', type: 'button', onclick: expertSheet }, 'Download the expert-check sheet (Excel)')),
+      h('p', { class: 'note' }, 'Two experts mark whether each key is right and whether each question can be answered from the core page.')));
+  }
+
+  /* =============================== Publish =============================== */
+  function secPublish(main) {
+    const errs = runChecks().filter(r => r.level === 'error');
+    main.append(h('h2', null, 'Publish and versions'), h('p', { class: 'lead' }, 'Participants always get a published version, never the draft. Each person keeps the version they started with, and their data records it.'));
+    const note = h('input', { class: 'in', placeholder: 'What changed, e.g. “ReMeDe text imported; pilot fixes”' });
+    const pubBtn = h('button', { class: 'btn primary', type: 'button', disabled: !E.conn || errs.length || !differsFromPublished() }, 'Publish as version ' + (E.published + 1));
+    const sure = h('button', { class: 'btn primary', type: 'button', style: 'display:none' }, 'Yes, publish');
+    pubBtn.addEventListener('click', () => { pubBtn.style.display = 'none'; sure.style.display = ''; sure.focus(); });
+    sure.addEventListener('click', async () => {
+      sure.disabled = true;
+      try {
+        if (!(await pushDraft())) throw new Error('The draft could not be saved, so nothing was published.');
+        const r = await api('publish', { note: note.value.trim(), content: E.draft });
+        E.published = r.version; E.draft.version = r.version; E.publishedContent = clone(E.draft); E.savedAt = r.saved; E.dirty = false;
+        toast('Published version ' + r.version + '. New participants get it now.'); render();
+      } catch (e) { toast(e.message, 6000); sure.disabled = false; }
+    });
+    const why = !E.conn ? 'Connect to the backend to publish.' : errs.length ? 'Fix the ' + errs.length + ' error' + (errs.length > 1 ? 's' : '') + ' under Checks first.' : !differsFromPublished() ? 'The draft is the same as the published version.' : '';
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Publish the draft'), h('div', { class: 'fld' }, h('label', null, 'Note for this version'), note),
+      h('div', { class: 'row' }, pubBtn, sure, why ? h('span', { class: 'note' }, why) : null)));
+    const vbox = h('div', { class: 'card' }, h('h4', null, 'Published versions'));
+    main.append(vbox);
+    if (E.conn) api('versions').then(r => {
+      E.versions = r.versions;
+      if (!r.versions.length) { vbox.append(h('p', { class: 'note' }, 'Nothing is published yet.')); return; }
+      const tbl = h('table', { class: 't' }, h('tr', null, h('th', null, 'Version'), h('th', null, 'Published'), h('th', null, 'Note'), h('th', null, '')));
+      r.versions.forEach(v => tbl.append(h('tr', null, h('td', null, String(v.version)), h('td', null, new Date(v.saved).toLocaleString()), h('td', null, v.note || ''),
+        h('td', null, h('div', { class: 'row' },
+          h('button', { class: 'btn sm quiet', type: 'button', onclick: async () => { const c = (await api('getVersion', { v: v.version })).content; download('IS_study_content_v' + v.version + '.json', JSON.stringify(c, null, 1), 'application/json'); } }, 'Download'),
+          h('button', { class: 'btn sm quiet', type: 'button', onclick: async () => { if (!await confirmBox('Load version ' + v.version + ' into the draft?', 'The current draft is replaced. Download it first if you want to keep it.', 'Load it')) return; setDraft((await api('getVersion', { v: v.version })).content); changed(); render(); } }, 'Load into draft'))))));
+      vbox.append(h('div', { class: 'scroll' }, tbl), h('p', { class: 'note' }, 'Archive the version you collect data with alongside the preregistration: it is the exact text every participant saw.'));
+    }).catch(e => vbox.append(h('div', { class: 'msg bad' }, e.message)));
+    else vbox.append(h('p', { class: 'note' }, 'Connect to see the versions.'));
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Files'), h('p', { class: 'note' }, 'A study file holds everything, including the answer keys: keep it private.'),
+      h('div', { class: 'row' }, h('button', { class: 'btn', type: 'button', onclick: () => download('IS_study_content_draft_' + stamp() + '.json', JSON.stringify(D(), null, 1), 'application/json') }, 'Download the draft'),
+        fileButton('Replace the draft with a file…', async c => { if (!await confirmBox('Replace the draft?', 'Everything in the current draft is replaced by the file.', 'Replace')) return; setDraft(c); changed(); render(); }))));
+  }
+
+  /* =============================== Data =============================== */
+  function secData(main) {
+    main.append(h('h2', null, 'Participants and data'), h('p', { class: 'lead' }, 'Everyone who started, and the data for the analysis kit.'));
+    if (!E.conn) { main.append(h('div', { class: 'msg amber' }, 'Connect to the backend to see participants.')); return; }
+    const box = h('div', { class: 'card' }, 'Loading…');
+    main.append(h('div', { class: 'card' }, h('h4', null, 'Download'),
+      h('p', { class: 'note', html: 'The Excel file is what <code>analyse_is_study.py prepare --data</code> reads: one sheet each for participants, method blocks and questions, scored against the keys of the version each person saw.' }),
+      h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'button', onclick: e => exportData(e.target, 'xlsx') }, 'Download data (Excel)'),
+        h('button', { class: 'btn quiet', type: 'button', onclick: e => exportData(e.target, 'json') }, 'Download raw data (JSON)'))), box);
+    api('participants').then(r => {
+      E.parts = r.participants; box.innerHTML = '';
+      const flt = { status: '', pilot: 'main' };
+      const tbody = h('tbody');
+      const draw = () => {
+        tbody.innerHTML = '';
+        E.parts.filter(p => (!flt.status || p.status === flt.status) && (flt.pilot === 'all' || (flt.pilot === 'main' ? !p.pilot : !!p.pilot))).forEach(p => {
+          const del = h('button', { class: 'btn sm danger', type: 'button' }, 'Delete');
+          del.addEventListener('click', async () => {
+            if (!await confirmBox('Delete ' + esc(p.pid) + '?', 'Removes this person and their answers from the Sheet for good. Use it for test runs; for real participants who ask, they can withdraw themselves.', 'Delete', true)) return;
+            try { await api('deleteParticipant', { pid: p.pid }); E.parts = E.parts.filter(x => x !== p); draw(); toast(p.pid + ' deleted.'); } catch (e) { toast(e.message, 6000); }
+          });
+          tbody.append(h('tr', null, [p.pid, p.group, p.condition, p.pilot || '', 'v' + p.version, p.status, p.step, p.started ? new Date(p.started).toLocaleString() : '', p.minutes === '' ? '' : String(p.minutes)].map(v => h('td', null, v)), h('td', null, del)));
+        });
+      };
+      const sel = (k, opts) => { const s = h('select', { class: 'in', style: 'width:auto' }, opts.map(([v, l]) => h('option', { value: v, selected: flt[k] === v }, l))); s.addEventListener('change', () => { flt[k] = s.value; draw(); }); return s; };
+      box.append(h('div', { class: 'row', style: 'margin-bottom:8px' }, sel('pilot', [['main', 'Main study'], ['pilot', 'Pilots'], ['all', 'Everyone']]), sel('status', [['', 'Any status'], ['completed', 'Finished'], ['in progress', 'In progress'], ['started', 'Started'], ['withdrawn', 'Withdrawn']]),
+        h('button', { class: 'btn sm quiet', type: 'button', onclick: () => render() }, 'Refresh')),
+        h('div', { class: 'scroll' }, h('table', { class: 't' }, h('thead', null, h('tr', null, ['ID', 'Group', 'Condition', 'Pilot', 'Version', 'Status', 'Step', 'Started', 'Minutes', ''].map(x => h('th', null, x)))), tbody)));
+      draw();
+    }).catch(e => { box.innerHTML = ''; box.append(h('div', { class: 'msg bad' }, e.message)); });
+  }
+  async function exportData(btn, kind) {
+    btn.disabled = true; const label = btn.textContent; btn.textContent = 'Preparing…';
+    try {
+      const r = await api('responses');
+      const versions = {};
+      for (const v of new Set(r.participants.map(p => p.version).filter(Boolean))) versions[v] = (await api('getVersion', { v })).content;
+      if (kind === 'json') download('IS_study_raw_' + stamp() + '.json', JSON.stringify({ exported: new Date().toISOString(), participants: r.participants, versions }, null, 1), 'application/json');
+      else download('IS_study_data_' + stamp() + '.xlsx', XLSX.build(dataSheets(r.participants, versions)));
+      toast('Downloaded ' + r.participants.length + ' participants.');
+    } catch (e) { toast(e.message, 6000); }
+    btn.disabled = false; btn.textContent = label;
+  }
+  function itemVars(c, list) {
+    const out = [];
+    (list || []).forEach(it => {
+      if (it.type === 'note') return;
+      if (it.type === 'cvr') { c.elements.forEach((e, j) => out.push([it.var + String(j + 1).padStart(2, '0'), 'Rating of element ' + (j + 1) + ', ' + e.name + ' (1-' + it.points + ')'])); if (it.attn) out.push([it.attn.var, 'Attention check (correct: ' + it.attn.value + ')']); return; }
+      if (it.type === 'methodgrid') { c.methods.forEach(m => out.push([it.var + '_' + m.id, it.t + ' ' + m.name + ' (1-' + it.points + ')'])); return; }
+      out.push([it.var, it.t]);
+      if (it.other) out.push([it.var + '_other', it.t + ' (Other, text)']);
+    });
+    return out;
+  }
+  function dataSheets(parts, versions) {
+    const vs = Object.keys(versions).map(Number);
+    const latest = versions[Math.max(...vs)] || D();
+    const cOf = p => versions[p.version] || latest;
+    const sec = ms => ms == null ? '' : Math.round(ms / 1000);
+    const aboutVars = itemVars(latest, latest.about), viewVars = itemVars(latest, latest.views);
+    const extra = (key, known) => { const s = new Set(known.map(x => x[0])); const add = []; parts.forEach(p => Object.keys((p.state || {})[key] || {}).forEach(k => { if (!s.has(k)) { s.add(k); add.push([k, '']); } })); return known.concat(add); };
+    const AV = extra('about', aboutVars), VV = extra('views', viewVars);
+    const val = v => Array.isArray(v) ? v.join('; ') : v == null ? '' : v;
+    const P = [['pid', 'group', 'condition', 'pilot', 'version', 'status', 'step', 'started', 'submitted', 'minutes'].concat(AV.map(x => 'about_' + x[0]), VV.map(x => 'views_' + x[0]), ['screen_w', 'screen_h', 'touch'])];
+    const B = [['pid', 'group', 'condition', 'pilot', 'version', 'status', 'block', 'method', 'method_name', 'phase', 'pair', 'position_in_pair', 'format', 'is_first', 'questions', 'correct', 'core_questions', 'core_correct',
+      'ease', 'work', 'conf', 'useful', 'plan', 'mistake', 'teachuse', 'read_s', 'work_s', 'teach_s', 'hidden_s', 'familiarity']];
+    const I = [['pid', 'group', 'condition', 'pilot', 'version', 'status', 'block', 'method', 'format', 'item', 'qid', 'kind', 'core', 'answer', 'key', 'correct']];
+    parts.forEach(p => {
+      const s = p.state || {}, c = cOf(p), about = s.about || {}, views = s.views || {}, env = s.env || {};
+      P.push([p.pid, p.group, p.condition, p.pilot, p.version, p.status, p.step, p.started, p.submitted, p.minutes].concat(AV.map(x => val(about[x[0]])), VV.map(x => val(views[x[0]])), [val(env.w), val(env.h), env.touch ? 1 : env.touch === false ? 0 : '']));
+      const blocks = s.blocks || [];
+      const isFirst = blocks[0] ? (blocks[0].format === 'is' ? 1 : 0) : '';
+      blocks.forEach((b, k) => {
+        const m = c.methods.find(x => x.id === b.method) || { questions: [], name: b.method };
+        const pr = c.pairs.find(x => x.methods.includes(b.method)) || { id: '', methods: [] };
+        const qs = m.questions.filter(q => q.on), ans = b.answers || {};
+        const right = qs.filter(q => ans[q.id] && ans[q.id] === q.key), core = qs.filter(q => q.core);
+        const t = b.t || {};
+        B.push([p.pid, p.group, p.condition, p.pilot, p.version, p.status, k + 1, b.method, m.name, m.phase || '', pr.id, pr.methods.indexOf(b.method) + 1, b.format, isFirst,
+          qs.length, right.length, core.length, core.filter(q => ans[q.id] === q.key).length, val(b.ease), val(b.work), val(b.conf), val(b.useful), val(b.plan), val(b.mistake), val(b.teachuse),
+          t.start && t.a ? sec(t.a - t.start) : '', t.a && t.b ? sec(t.b - t.a) : '', t.b && t.c ? sec(t.c - t.b) : '', b.hidden_ms ? sec(b.hidden_ms) : 0, val(about['fam_' + b.method])]);
+        qs.forEach(q => I.push([p.pid, p.group, p.condition, p.pilot, p.version, p.status, k + 1, b.method, b.format, b.method + '_' + q.id, q.id, q.kind, q.core ? 1 : 0, ans[q.id] || '', q.key, ans[q.id] === q.key ? 1 : 0]));
+      });
+    });
+    const M = [['id', 'name', 'phase', 'pair', 'position_in_pair', 'source', 'imported_at', 'sha256']].concat(latest.methods.map(m => { const pr = latest.pairs.find(x => x.methods.includes(m.id)) || { id: '', methods: [] }; return [m.id, m.name, m.phase || '', pr.id, pr.methods.indexOf(m.id) + 1 || '', m.source || '', m.importedAt || '', m.sha256 || '']; }));
+    const R = [['method', 'method_name', 'mechanism', 'procedure', 'output', 'mistakes', 'checks']].concat(latest.methods.map(m => { const r = m.rubric || {}; return [m.id, m.name, r.mechanism || '', (r.procedure || []).join('\n'), r.output || '', r.mistakes || '', r.checks || '']; }));
+    const EL = [['n', 'element', 'description', 'on_core_page']].concat(latest.elements.map((e, i) => [i + 1, e.name, e.desc, latest.core.some(s => s.elements.includes(e.name)) ? 1 : 0]));
+    const cvrItem = (latest.views || []).find(it => it.type === 'cvr' && it.attn);
+    const CR = [['criterion', 'value']].concat(Object.entries(latest.criteria || {}).map(([k, v]) => [k, Array.isArray(v) ? v.join('; ') : v]),
+      cvrItem ? [['attention_variable', cvrItem.attn.var], ['attention_value', cvrItem.attn.value]] : []);
+    const V = [['version', 'published', 'methods_with_preview_text']].concat(vs.sort((a, b) => a - b).map(v => [v, versions[v].publishedAt || '', versions[v].methods.filter(m => m.source === 'preview').map(m => m.name).join('; ')]));
+    const CB = [['sheet', 'column', 'meaning']].concat(
+      [['Participants', 'pid', 'Participant ID (group, then P for pilots, then a number)'], ['Participants', 'condition', 'Pair letter, then 1 = first method on the IS page, 2 = second method on the IS page'], ['Participants', 'pilot', 'Empty for the main study; 1 = pilot; nopage = no-page pilot'],
+        ['Participants', 'version', 'Content version the participant saw'], ['Participants', 'minutes', 'Minutes from consent to submitting'],
+        ['Blocks', 'format', 'is = IS page (all elements); core = core page; none = no page (pilot)'], ['Blocks', 'is_first', '1 if the IS page came first'], ['Blocks', 'correct', 'Questions answered correctly, of “questions”'],
+        ['Blocks', 'core_correct', 'Correct answers among questions answerable from the core page'], ['Blocks', 'read_s', 'Seconds from opening the method to finishing the questions'], ['Blocks', 'work_s', 'Seconds on the task'], ['Blocks', 'teach_s', 'Seconds on the teaching part'],
+        ['Blocks', 'hidden_s', 'Seconds the tab was hidden during this method (looking elsewhere)'], ['Blocks', 'familiarity', 'Prior familiarity with this method (1-5)'], ['Items', 'correct', '1 if the answer matches the key of the version the participant saw']]
+        .concat(AV.map(x => ['Participants', 'about_' + x[0], x[1]]), VV.map(x => ['Participants', 'views_' + x[0], x[1]])));
+    const W = [['warning']];
+    const elSets = new Set(vs.map(v => JSON.stringify(versions[v].elements.map(e => e.name))));
+    if (elSets.size > 1) W.push(['The published versions in this file list different elements, so views_e01, views_e02 … do not mean the same element for everyone. Check the Versions sheet before computing content validity ratios.']);
+    const prSets = new Set(vs.map(v => JSON.stringify(versions[v].pairs)));
+    if (prSets.size > 1) W.push(['The published versions in this file have different pairs, so a condition code may not mean the same methods for everyone.']);
+    return [{ name: 'Participants', rows: P }, { name: 'Blocks', rows: B }, { name: 'Items', rows: I }, { name: 'Methods', rows: M }, { name: 'Rubric', rows: R }, { name: 'Elements', rows: EL }, { name: 'Criteria', rows: CR }, { name: 'Versions', rows: V }, { name: 'Codebook', rows: CB }].concat(W.length > 1 ? [{ name: 'Warnings', rows: W }] : []);
+  }
+  function expertSheet() {
+    const c = D();
+    const rows = [['Method', 'Phase', 'Question', 'Kind', 'Answerable from the core page (author)', 'Question text', 'A', 'B', 'C', 'D', 'Key', 'Source on the page', 'Expert 1: key is correct (Y/N)', 'Expert 2: key is correct (Y/N)', 'Expert 1: answerable from the core page (Y/N)', 'Expert 2: answerable from the core page (Y/N)', 'Notes']];
+    c.pairs.forEach(p => p.methods.forEach(id => { const m = c.methods.find(x => x.id === id); if (!m) return; m.questions.filter(q => q.on).forEach(q => rows.push([m.name, m.phase || '', q.id, q.kind, q.core ? 'yes' : 'no', q.stem].concat(q.options, [q.key, q.source || '', '', '', '', '', '']))); }));
+    download('IS_study_expert_check_' + stamp() + '.xlsx', XLSX.build([{ name: 'Answer key', rows, widths: [20, 18, 9, 11, 12, 50, 30, 30, 30, 30, 5, 24, 12, 12, 14, 14, 30] }]));
+  }
+
+  /* =============================== a small .xlsx writer =============================== */
+  const XLSX = (() => {
+    const T = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; T[n] = c >>> 0; }
+    const crc = u => { let c = 0xFFFFFFFF; for (let i = 0; i < u.length; i++) c = T[(c ^ u[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+    const enc = new TextEncoder();
+    function zip(files) {
+      const parts = [], central = []; let off = 0;
+      files.forEach(f => {
+        const name = enc.encode(f.name), data = f.data, c = crc(data);
+        const lh = new DataView(new ArrayBuffer(30));
+        lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(8, 0, true); lh.setUint32(14, c, true); lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true); lh.setUint16(26, name.length, true);
+        parts.push(new Uint8Array(lh.buffer), name, data);
+        const ch = new DataView(new ArrayBuffer(46));
+        ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint32(16, c, true); ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+        central.push(new Uint8Array(ch.buffer), name);
+        off += 30 + name.length + data.length;
+      });
+      const size = central.reduce((s, a) => s + a.length, 0);
+      const end = new DataView(new ArrayBuffer(22));
+      end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, size, true); end.setUint32(16, off, true);
+      return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    }
+    const x = s => String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const col = n => { let s = ''; n++; while (n) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
+    function sheet(rows, widths) {
+      const body = rows.map((r, i) => '<row r="' + (i + 1) + '">' + r.map((v, j) => {
+        const ref = col(j) + (i + 1), st = i === 0 ? ' s="1"' : '';
+        if (v === '' || v == null) return '';
+        if (typeof v === 'number' && isFinite(v)) return '<c r="' + ref + '"' + st + '><v>' + v + '</v></c>';
+        if (typeof v === 'boolean') return '<c r="' + ref + '"' + st + ' t="b"><v>' + (v ? 1 : 0) + '</v></c>';
+        let s = String(v); if (s.length > 32000) s = s.slice(0, 32000);
+        return '<c r="' + ref + '"' + st + ' t="inlineStr"><is><t xml:space="preserve">' + x(s) + '</t></is></c>';
+      }).join('') + '</row>').join('');
+      const cols = widths ? '<cols>' + widths.map((w, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>').join('') + '</cols>' : '';
+      return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' + cols + '<sheetData>' + body + '</sheetData></worksheet>';
+    }
+    function build(sheets) {
+      const X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n', files = [], put = (name, s) => files.push({ name, data: enc.encode(s) });
+      put('[Content_Types].xml', X + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + sheets.map((_, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '</Types>');
+      put('_rels/.rels', X + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>');
+      put('xl/workbook.xml', X + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' + sheets.map((s, i) => '<sheet name="' + x(s.name.slice(0, 31)) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets></workbook>');
+      put('xl/_rels/workbook.xml.rels', X + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + sheets.map((_, i) => '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>');
+      put('xl/styles.xml', X + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>');
+      sheets.forEach((s, i) => put('xl/worksheets/sheet' + (i + 1) + '.xml', sheet(s.rows, s.widths)));
+      return zip(files);
+    }
+    return { build };
+  })();
+
+  /* =============================== header buttons and start =============================== */
+  $('#pv-btn').addEventListener('click', () => { if (!E.draft) return toast('Load a study first.'); preview({ g: D().groups[0].id }); });
+  $('#pub-btn').addEventListener('click', () => { if (!E.draft) return; E.section = 'publish'; render(); });
+  window.addEventListener('beforeunload', e => { if (E.dirty && E.conn) { pushDraft(); e.preventDefault(); e.returnValue = ''; } });
+  window.__editor = { E, runChecks, parseRemede, dataSheets, clean };   // used by the automated tests
+  (async function start() {
+    render();
+    if (E.backend && E.key) {
+      try { await connect(); } catch (e) { toast('Could not connect: ' + e.message, 6000); }
+      render();
+    }
+  })();
+})();
+</script>
+</body>
+</html>
